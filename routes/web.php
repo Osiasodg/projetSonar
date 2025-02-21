@@ -1,0 +1,120 @@
+<?php
+
+use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BonController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GestionnaireController;
+use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\Auth\LoginController;
+//use App\Http\Middleware\CheckRole;
+
+// ----------------------------
+// Routes publiques (sans authentification)
+// ----------------------------
+
+// Page d'accueil
+Route::get('/', [HomeController::class, 'index'])->name('home.form');
+
+// Affichage du formulaire de connexion
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Traitement de la connexion
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+
+// Affichage du formulaire d'inscription
+Route::get('/register', function () {
+    return view('auth.register'); // Redirige vers la vue d'inscription
+})->name('register.form');
+
+// Affichage du formulaire de vérification des bons
+Route::get('/verifier', function () {
+    return view('bons.verifier'); // Formulaire de vérification
+})->name('verifier.form');
+
+// Affichage du formulaire de vérification des bons (alternative)
+Route::get('/bons/verifier', [BonController::class, 'showForm'])->name('bons.form');
+
+// Traitement de la vérification des bons
+Route::post('/verifier', [BonController::class, 'verifier'])->name('bons.verifier');
+
+// ----------------------------
+// Routes d'authentification (gestionnaires/admin)
+// ----------------------------
+
+// Désactive l'inscription par défaut
+Auth::routes(['register' => false]);
+
+// Redirection après connexion
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// ----------------------------
+// Routes protégées par authentification
+// ----------------------------
+
+// Changement de mot de passe
+Route::middleware(['auth'])->group(function () {
+    Route::get('/change-password', [PasswordController::class, 'showChangeForm'])->name('password.change');
+   // Route::post('/change-password', [PasswordController::class, 'changePassword'])->name('password.update');
+});
+
+// ----------------------------
+// Routes pour les gestionnaires
+// ----------------------------
+
+//Route::prefix('gestionnaire')->middleware(['auth', 'force.password.change', 'role:gestionnaire'])->group(function () {
+    // Tableau de bord des gestionnaires
+ //   Route::get('/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
+
+    // Importation de fichiers (Excel, etc.)
+ //   Route::post('/import', [BonController::class, 'import'])->name('import');
+//});
+
+// ----------------------------
+// Routes pour les administrateurs
+// ----------------------------
+
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+
+    Route::get('/gestionnaire', function () {
+        return view('gestionnaire.dashboard');
+    })->name('gestionnaire.dashboard');
+
+
+// Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+//     // Tableau de bord des administrateurs
+//     Route::get('/dashboard', function () {
+//         return view('admin.dashboard');
+//     })->name('admin.dashboard');
+
+    // Gestion des gestionnaires
+    Route::get('/gestionnaires', [AdminController::class, 'gestionnaires'])->name('admin.gestionnaires');
+    Route::post('/gestionnaires/create', [AdminController::class, 'createGestionnaire'])->name('admin.gestionnaires.create');
+    Route::post('/gestionnaires/update/{id}', [AdminController::class, 'updateGestionnaire'])->name('admin.gestionnaires.update');
+    Route::post('/gestionnaires/delete/{id}', [AdminController::class, 'deleteGestionnaire'])->name('admin.gestionnaires.delete');
+    Route::post('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset');
+
+    // Gestion des sociétés
+    Route::get('/societes', [AdminController::class, 'societes'])->name('admin.societes');
+    Route::post('/societes/create', [AdminController::class, 'createSociete'])->name('admin.societes.create');
+    Route::post('/societes/update/{id}', [AdminController::class, 'updateSociete'])->name('admin.societes.update');
+    Route::post('/societes/delete/{id}', [AdminController::class, 'deleteSociete'])->name('admin.societes.delete');
+
+    // Gestion des signataires
+    Route::get('/signataires', [AdminController::class, 'signataires'])->name('admin.signataires');
+    Route::post('/signataires/create', [AdminController::class, 'createSignataire'])->name('admin.signataires.create');
+    Route::post('/signataires/update/{id}', [AdminController::class, 'updateSignataire'])->name('admin.signataires.update');
+    Route::post('/signataires/delete/{id}', [AdminController::class, 'deleteSignataire'])->name('admin.signataires.delete');
+
+    // Gestion des modèles
+    Route::get('/modeles', [AdminController::class, 'modeles'])->name('admin.modeles');
+    Route::post('/modeles/create', [AdminController::class, 'createModele'])->name('admin.modeles.create');
+    Route::post('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
+    Route::post('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
+
+    // Journal d'audit
+    Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
+//});
