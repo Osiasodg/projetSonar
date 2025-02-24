@@ -123,5 +123,7 @@ class AdminController extends Controller
         $audits = Audit::orderBy('created_at', 'desc')->get();
         return view('admin.audit', compact('audits'));
     }
+
+    
 }
 

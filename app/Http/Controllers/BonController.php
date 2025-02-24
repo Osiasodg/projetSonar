@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Bon;
+use Carbon\Carbon;
+
 
 class BonController extends Controller
 {
@@ -17,9 +19,23 @@ class BonController extends Controller
             return back()->with('error', 'Aucun bon trouvé avec ce numéro');
         }
 
-        // Logique de vérification...
-        
-        return back()->with('success', 'Bon valide !');
+        // Vérification de la date de validité
+        if (Carbon::parse($bon->date_validite)->isPast()) {
+            return back()->with('error', 'Bon invalide');
+        }
+
+        // Vérification de l'état d'utilisation
+        if ($bon->utilise) {
+            return back()->with('error', 'Bon invalide (déjà utilisé)');
+        }
+
+        // Mise à jour du bon comme "utilisé"
+        $bon->update([
+            'utilise' => true,
+            'date_validation' => Carbon::now()
+        ]);
+
+        return back()->with('success', 'Bon validé avec succès');
     }
 
     public function showForm()

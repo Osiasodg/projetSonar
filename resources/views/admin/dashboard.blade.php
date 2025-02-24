@@ -1,97 +1,53 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Tableau de Bord - Gestionnaire</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <!-- Formulaire d'importation -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">Administrateur - Importer un fichier Excel</h2>
-            </div>
-            <div class="card-body">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Fichier Excel (.xlsx, .xls)</label>
-                        <input type="file" name="file" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Logo de l'entreprise</label>
-                        <input type="file" name="logo" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Entité</label>
-                        <select name="entite" class="form-select" required>
-                            <option value="SONAR VIE">SONAR VIE</option>
-                            <option value="SONAR-IARD">SONAR-IARD</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Date de validité</label>
-                        <input type="date" name="date_validite" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Récepteur du bon</label>
-                        <input type="text" name="recepteur" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-success">Importer</button>
-                </form>
-            </div>
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-5">
+    <h2 class="text-center">Tableau de Bord - Administrateur</h2>
+
+    <!-- Onglets -->
+    <ul class="nav nav-tabs mt-4" id="adminTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="gestionnaire-tab" data-bs-toggle="tab" href="#gestionnaire" role="tab">Gestionnaires</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="societe-tab" data-bs-toggle="tab" href="#societe" role="tab">Sociétés</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="signataire-tab" data-bs-toggle="tab" href="#signataire" role="tab">Signataires</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="modele-tab" data-bs-toggle="tab" href="#modele" role="tab">Modèles</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="audit-tab" data-bs-toggle="tab" href="#audit" role="tab">Journal d'Audit</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3" id="adminTabsContent">
+        <!-- Gestionnaires -->
+        <div class="tab-pane fade show active" id="gestionnaire" role="tabpanel">
+            @include('admin.gestionnaires')
         </div>
 
-        <!-- Aperçu après importation -->
-        @if(isset($bons) && $bons->count() > 0)
-            <div class="card shadow mt-4">
-                <div class="card-header bg-info text-white">
-                    <h3 class="mb-0">Aperçu des bénéficiaires ({{ $bons->count() }})</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>N° Bon</th>
-                                    <th>Nom</th>
-                                    <th>Prénom</th>
-                                    <th>Montant</th>
-                                    <th>Date validité</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($bons as $bon)
-                                    <tr>
-                                        <td>{{ $bon->numero_bon }}</td>
-                                        <td>{{ $bon->nom }}</td>
-                                        <td>{{ $bon->prenom }}</td>
-                                        <td>{{ $bon->montant }} €</td>
-                                        <td>{{ $bon->date_validite }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- Sociétés -->
+        <div class="tab-pane fade" id="societe" role="tabpanel">
+            @include('admin.partials.societes')
+        </div>
 
-                    <!-- Bouton Générer PDF -->
-                    <form action="{{ route('generate.pdfs') }}" method="POST" class="mt-4">
-                        @csrf
-                        <button type="submit" class="btn btn-warning btn-lg">
-                            🖨️ Générer tous les PDF
-                        </button>
-                    </form>
-                </div>
-            </div>
-        @endif
+        <!-- Signataires -->
+        <div class="tab-pane fade" id="signataire" role="tabpanel">
+            @include('admin.partials.signataires')
+        </div>
 
-        <!-- Messages de succès/erreur -->
-        @if(session('success'))
-            <div class="alert alert-success mt-4">
-                {{ session('success') }}
-            </div>
-        @endif
+        <!-- Modèles -->
+        <div class="tab-pane fade" id="modele" role="tabpanel">
+            @include('admin.partials.modeles')
+        </div>
+
+        <!-- Journal d'Audit -->
+        <div class="tab-pane fade" id="audit" role="tabpanel">
+            @include('admin.partials.audit')
+        </div>
     </div>
-</body>
-</html>
+</div>
+@endsection

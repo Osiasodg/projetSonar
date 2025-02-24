@@ -13,7 +13,7 @@
                 <h2 class="mb-0">Gestionnaire - Importer un fichier Excel</h2>
             </div>
             <div class="card-body">
-                <form action="" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('gestionnaire.import') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Fichier Excel (.xlsx, .xls)</label>
@@ -38,10 +38,24 @@
                         <label class="form-label">Récepteur du bon</label>
                         <input type="text" name="recepteur" class="form-control" required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Téléphone du récepteur</label>
+                        <input type="text" name="telephone" class="form-control" required>
+                    </div>
                     <button type="submit" class="btn btn-success">Importer</button>
                 </form>
             </div>
         </div>
+<!-- //////////////////////////////////////////////// -->
+        @if(session('success'))
+            <div class="alert alert-success mt-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('bons'))
+            @php $bons = session('bons'); @endphp
+        @endif
 
         <!-- Aperçu après importation -->
         @if(isset($bons) && $bons->count() > 0)

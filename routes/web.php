@@ -65,11 +65,13 @@ Route::middleware(['auth'])->group(function () {
 
 //Route::prefix('gestionnaire')->middleware(['auth', 'force.password.change', 'role:gestionnaire'])->group(function () {
     // Tableau de bord des gestionnaires
- //   Route::get('/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
+ //  Route::get('/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
 
     // Importation de fichiers (Excel, etc.)
  //   Route::post('/import', [BonController::class, 'import'])->name('import');
 //});
+
+   
 
 // ----------------------------
 // Routes pour les administrateurs
@@ -83,6 +85,17 @@ Route::middleware(['auth'])->group(function () {
         return view('gestionnaire.dashboard');
     })->name('gestionnaire.dashboard');
 
+
+    // Importation de fichiers Excel
+    Route::post('/import', [GestionnaireController::class, 'import'])->name('gestionnaire.import');
+    // affichage des bons
+    Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
+
+
+    // Génération de PDF
+    Route::get('/generate-pdf/{bon}', [GestionnaireController::class, 'generatePDF'])->name('gestionnaire.generate-pdf');
+
+    
 
 // Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 //     // Tableau de bord des administrateurs
