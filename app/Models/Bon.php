@@ -24,6 +24,7 @@ class Bon extends Model
         'recepteur',
         'telephone',
         'entite',     
-        'logo_path',  
+        'logo_path', 
+        'user_id' 
     ];
 }

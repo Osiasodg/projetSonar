@@ -21,24 +21,28 @@ class GestionnaireController extends Controller
     // Importe un fichier Excel
     public function import(Request $request)
     {
-        $request->validate([
+        // Validation des données reçues
+        $validated = $request->validate([
             'file' => 'required|mimes:xlsx,xls|max:2048',
             'logo' => 'required|image|max:2048',
             'entite' => 'required|string',
             'date_validite' => 'required|date',
-            'recepteur' => 'required|string'
+            'recepteur' => 'required|string',
+            'telephone' => 'required|string'
         ]);
 
-        // Logique d'importation ici
-        Excel::import(new BonsImport, $request->file('file'));
+        // Enregistrer le logo et récupérer son chemin
+        $logoPath = $request->file('logo')->store('logos', 'public');
+
+        // Importer le fichier Excel
+        Excel::import(new BonsImport(
+            $validated['entite'], 
+            $validated['date_validite'], 
+            $validated['recepteur'], 
+            $validated['telephone'], 
+            $logoPath
+        ), $request->file('file'));
 
         return back()->with('success', 'Fichier importé avec succès !');
-    }
-
-    // Génère un PDF pour un bon spécifique
-    public function generatePDF(Bon $bon)
-    {
-        $pdf = Pdf::loadView('pdf.bon', ['bon' => $bon]);
-        return $pdf->download('bon-' . $bon->id . '.pdf');
     }
 }
