@@ -5,7 +5,7 @@
     <title>Bon d'Achat</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        .container { width: 80%; margin: auto; border: 2px solid black; padding: 20px; }
+        .container { width: 80%; margin: auto; padding: 20px; }
         .header { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
         .montant { color: green; font-size: 30px; font-weight: bold; margin: 10px 0; }
         .validite { color: red; font-size: 18px; margin-top: 10px; }

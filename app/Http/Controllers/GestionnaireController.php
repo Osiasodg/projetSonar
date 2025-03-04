@@ -62,9 +62,12 @@ class GestionnaireController extends Controller
         $logoPath
     ), $request->file('file'));
 
+    // Initialiser le tableau des bons importés
+    $importedBons = [];
+
     // Enregistrer les données dans la base de données
     foreach ($data[0] as $row) {
-        Bon::create([
+        $bon = Bon::create([
             'numero' => date('Y') . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT) . 'S', // Générer le numéro de bon
             'beneficiaire' => strtoupper($row['nom']) . ' ' . ucfirst(strtolower($row['prenom'])), 
             'montant' => (float) str_replace(',', '.', $row['montant']),
@@ -76,27 +79,37 @@ class GestionnaireController extends Controller
             'logo_path' => $logoPath,
             'user_id' => auth()->id() ?? 1, // Ajoute l'ID de l'utilisateur connecté, ou une valeur par défaut
         ]);
+
+        // Ajouter le bon importé au tableau
+        $importedBons[] = $bon;
     }
 
-    // Récupérer tous les bons pour les afficher
-    $bons = Bon::all();
+    // Stocker les bons importés dans la session
+    session(['importedBons' => $importedBons]);
+
+    // Debug : Vérifier les données dans la session
+//dd(session('importedBons'));
 
     // Retourner à la vue avec les données et un message de succès
     return back()
         ->with('success', 'Fichier importé avec succès !')
-        ->with('bons', $bons); // Passer les données à la vue
+        ->with('bons', $importedBons); // Passer uniquement les bons importés à la vue
 }
 
 
     //methode pour generer les fichier pdf
     public function generatePDFs(Request $request)
     {
-        // Récupérer tous les bons
-        $bons = Bon::all();
+        // Récupérer les IDs des bons envoyés via le formulaire
+        $bonIds = $request->input('bon_ids', []);
+
+
+        // Récupérer les bons correspondants depuis la base de données
+    $importedBons = Bon::whereIn('id', $bonIds)->get();
 
         // Générer un PDF pour chaque bon
         $pdfs = [];
-        foreach ($bons as $bon) {
+        foreach ($importedBons as $bon) {
             // Générer le QR code
            // $qrCode = QrCode::size(100)->generate($bon->numero);
             // Générer le QR Code en format image base64
@@ -105,7 +118,7 @@ class GestionnaireController extends Controller
         $qrData .= "Montant: " . number_format($bon->montant, 0, ',', ' ') . " FCFA\n";
         $qrData .= "Validité: " . date('d/m/Y', strtotime($bon->date_validite)) . "\n";
 
-        $qrCode = QrCode::format('png')->size(200)->generate($qrData);
+        $qrCode = QrCode::format('png')->size(100)->generate($qrData);
         file_put_contents(storage_path('app/public/qrcode.png'), $qrCode);
 
         //$qrCode = base64_encode(QrCode::format('png')->size(200)->generate($bon->numero));
@@ -125,6 +138,9 @@ class GestionnaireController extends Controller
 
             $pdfs[] = $pdf;
         }
+
+        // Vider la session après la génération des PDFs
+    session()->forget('importedBons');
 
         // Télécharger les PDF
         return response()->streamDownload(function () use ($pdfs) {
