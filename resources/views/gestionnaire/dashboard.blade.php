@@ -46,22 +46,19 @@
                 </form>
             </div>
         </div>
-<!-- //////////////////////////////////////////////// -->
+
+        <!-- Messages de succès/erreur -->
         @if(session('success'))
             <div class="alert alert-success mt-4">
                 {{ session('success') }}
             </div>
         @endif
 
+       <!-- Aperçu après importation -->
         @if(session('bons'))
-            @php $bons = session('bons'); @endphp
-        @endif
-
-        <!-- Aperçu après importation -->
-        @if(isset($bons) && $bons->count() > 0)
             <div class="card shadow mt-4">
                 <div class="card-header bg-info text-white">
-                    <h3 class="mb-0">Aperçu des bénéficiaires ({{ $bons->count() }})</h3>
+                    <h3 class="mb-0">Aperçu des bénéficiaires ({{ session('bons')->count() }})</h3>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -69,20 +66,18 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>N° Bon</th>
-                                    <th>Nom</th>
-                                    <th>Prénom</th>
+                                    <th>Bénéficiaire</th>
                                     <th>Montant</th>
                                     <th>Date validité</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($bons as $bon)
+                                @foreach(session('bons') as $bon)
                                     <tr>
-                                        <td>{{ $bon->numero_bon }}</td>
-                                        <td>{{ $bon->nom }}</td>
-                                        <td>{{ $bon->prenom }}</td>
-                                        <td>{{ $bon->montant }} €</td>
-                                        <td>{{ $bon->date_validite }}</td>
+                                        <td>{{ $bon->numero }}</td>
+                                        <td>{{ $bon->beneficiaire }}</td>
+                                        <td>{{ number_format($bon->montant, 0, ',', ' ') }} FCFA</td>
+                                        <td>{{ date('d/m/Y', strtotime($bon->date_validite)) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -97,13 +92,6 @@
                         </button>
                     </form>
                 </div>
-            </div>
-        @endif
-
-        <!-- Messages de succès/erreur -->
-        @if(session('success'))
-            <div class="alert alert-success mt-4">
-                {{ session('success') }}
             </div>
         @endif
     </div>

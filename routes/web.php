@@ -93,7 +93,9 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Génération de PDF
-    Route::get('/generate-pdf/{bon}', [GestionnaireController::class, 'generatePDF'])->name('gestionnaire.generate-pdf');
+  //  Route::get('/generate-pdf/{bon}', [GestionnaireController::class, 'generatePDF'])->name('gestionnaire.generate-pdf');
+    Route::post('/generate-pdfs', [GestionnaireController::class, 'generatePDFs'])->name('generate.pdfs');
+    
 
     
 

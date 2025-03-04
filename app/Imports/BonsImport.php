@@ -26,7 +26,7 @@ class BonsImport implements ToModel, WithHeadingRow
     public function model(array $row)
 {
     return new Bon([
-        'numero' => date('Y') . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT) . 'S',
+        'numero' => date('Y') . str_pad(mt_rand(1, 999999), 6, '0', STR_PAD_LEFT) . 'S', // Générer le numéro de bon
         'beneficiaire' => strtoupper($row['nom']) . ' ' . ucfirst(strtolower($row['prenom'])), 
         'montant' => (float) str_replace(',', '.', $row['montant']),
         'date_validite' => $this->date_validite,
