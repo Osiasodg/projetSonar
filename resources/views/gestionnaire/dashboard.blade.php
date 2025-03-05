@@ -17,7 +17,8 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Fichier Excel (.xlsx, .xls)</label>
-                        <input type="file" name="file" class="form-control" required>
+                        <input type="file" id="fileInput" name="file" class="form-control" accept=".xlsx,.xls" required>
+                        <p id="fileError" class="text-danger mt-2" style="display: none;">Veuillez sélectionner un fichier Excel (.xls ou .xlsx).</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Logo de l'entreprise</label>
@@ -54,54 +55,72 @@
             </div>
         @endif
 
-       <!-- Aperçu après importation -->
-@if(session('bons') && count(session('bons')) > 0)
-    <div class="card shadow mt-4">
-        <div class="card-header bg-info text-white">
-            <h3 class="mb-0">Aperçu des bénéficiaires ({{ count(session('bons')) }})</h3>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>N° Bon</th>
-                            <th>Bénéficiaire</th>
-                            <th>Montant</th>
-                            <th>Date validité</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach(session('bons') as $bon)
-                            <tr>
-                                <td>{{ $bon->numero }}</td>
-                                <td>{{ $bon->beneficiaire }}</td>
-                                <td>{{ number_format($bon->montant, 0, ',', ' ') }} FCFA</td>
-                                <td>{{ date('d/m/Y', strtotime($bon->date_validite)) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        <!-- Aperçu après importation -->
+        @if(session('bons') && count(session('bons')) > 0)
+            <div class="card shadow mt-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Aperçu des bénéficiaires ({{ count(session('bons')) }})</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>N° Bon</th>
+                                    <th>Bénéficiaire</th>
+                                    <th>Montant</th>
+                                    <th>Date validité</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(session('bons') as $bon)
+                                    <tr>
+                                        <td>{{ $bon->numero }}</td>
+                                        <td>{{ $bon->beneficiaire }}</td>
+                                        <td>{{ number_format($bon->montant, 0, ',', ' ') }} FCFA</td>
+                                        <td>{{ date('d/m/Y', strtotime($bon->date_validite)) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-            <!-- Bouton Générer PDF -->
-            <form action="{{ route('generate.pdfs') }}" method="POST" class="mt-4">
-                @csrf
-                <!-- Champ caché pour envoyer les IDs des bons importés -->
-                @foreach(session('bons') as $bon)
-                    <input type="hidden" name="bon_ids[]" value="{{ $bon->id }}">
-                @endforeach
-                <button type="submit" class="btn btn-warning btn-lg">
-                    🖨️ Générer tous les PDF
-                </button>
-            </form>
-        </div>
+                    <!-- Bouton Générer PDF -->
+                    <form action="{{ route('generate.pdfs') }}" method="POST" class="mt-4">
+                        @csrf
+                        <!-- Champ caché pour envoyer les IDs des bons importés -->
+                        @foreach(session('bons') as $bon)
+                            <input type="hidden" name="bon_ids[]" value="{{ $bon->id }}">
+                        @endforeach
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            🖨️ Générer tous les PDF
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @else
+            <div class="alert alert-info mt-4">
+                Aucun bon importé pour le moment.
+            </div>
+        @endif
     </div>
-@else
-    <div class="alert alert-info mt-4">
-        Aucun bon importé pour le moment.
-    </div>
-@endif
-    </div>
+
+    <!-- JavaScript pour la validation du fichier -->
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const allowedExtensions = ['xlsx', 'xls'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                if (!allowedExtensions.includes(fileExtension)) {
+                    document.getElementById('fileError').style.display = 'block';
+                    this.value = ''; // Réinitialise le champ
+                } else {
+                    document.getElementById('fileError').style.display = 'none';
+                }
+            }
+        });
+    </script>
+
 </body>
 </html>

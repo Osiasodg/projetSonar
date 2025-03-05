@@ -57,6 +57,10 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::middleware(['auth'])->group(function () {
     Route::get('/change-password', [PasswordController::class, 'showChangeForm'])->name('password.change');
    // Route::post('/change-password', [PasswordController::class, 'changePassword'])->name('password.update');
+
+   //previsualisé le fichiers excel selectionné
+   Route::post('/gestionnaire/preview', [GestionnaireController::class, 'preview'])->name('gestionnaire.preview');
+
 });
 
 // ----------------------------
@@ -132,4 +136,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Journal d'audit
     Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
+
+    
+    Route::get('/gestionnaire/template', [GestionnaireController::class, 'template'])->name('gestionnaire.template');
 //});
