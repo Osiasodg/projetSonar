@@ -1,85 +1,126 @@
-<!-- Gestionnaires - resources/views/admin/gestionnaires.blade.php -->
-@extends('layouts.app')
-
-@section('content')
-<div class="container">
-    <h2 class="mb-4">Gestion des Gestionnaires</h2>
-
-    <!-- Message de confirmation -->
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    <!-- Bouton d'ajout -->
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addGestionnaireModal">Ajouter un Gestionnaire</button>
-
-    <!-- Tableau des gestionnaires -->
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Email</th>
-                <th>Service</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($gestionnaires as $gestionnaire)
-            <tr>
-                <td>{{ $gestionnaire->nom }}</td>
-                <td>{{ $gestionnaire->prenom }}</td>
-                <td>{{ $gestionnaire->email }}</td>
-                <td>{{ $gestionnaire->service }}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editGestionnaireModal{{ $gestionnaire->id }}">Modifier</button>
-                    <form action="{{ route('admin.gestionnaires.delete', $gestionnaire->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
-                    </form>
-                    <form action="{{ route('admin.gestionnaires.reset', $gestionnaire->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-secondary btn-sm">Réinitialiser MDP</button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-
-<!-- Modal Ajout Gestionnaire -->
-<div class="modal fade" id="addGestionnaireModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ajouter un Gestionnaire</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.gestionnaires.create') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <input type="text" name="nom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Prénom</label>
-                        <input type="text" name="prenom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Service</label>
-                        <input type="text" name="service" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Ajouter</button>
-                </form>
-            </div>
+<div class="card shadow mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>Gestion des gestionnaires</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGestionnaireModal">
+            <i class="fas fa-plus"></i> Ajouter
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Service</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($gestionnaires as $gestionnaire)
+                    <tr>
+                        <td>{{ $gestionnaire->name }}</td>
+                        <td>{{ $gestionnaire->prenom }}</td>
+                        <td>{{ $gestionnaire->email }}</td>
+                        <td>{{ $gestionnaire->service }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" 
+                                    data-bs-target="#editGestionnaireModal{{ $gestionnaire->id }}"
+                                    data-id="{{ $gestionnaire->id }}"
+                                    data-name="{{ $gestionnaire->name }}"
+                                    data-prenom="{{ $gestionnaire->prenom }}"
+                                    data-email="{{ $gestionnaire->email }}"
+                                    data-service="{{ $gestionnaire->service }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form action="{{ route('admin.gestionnaires.delete', $gestionnaire->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-@endsection
+<!-- Modal Ajout Gestionnaire -->
+<div class="modal fade" id="addGestionnaireModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.gestionnaires.create') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajouter un gestionnaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Nom</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Prénom</label>
+                        <input type="text" name="prenom" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Service</label>
+                        <input type="text" name="service" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'édition pour chaque gestionnaire -->
+@foreach($gestionnaires as $gestionnaire)
+<div class="modal fade" id="editGestionnaireModal{{ $gestionnaire->id }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.gestionnaires.update', $gestionnaire->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier le gestionnaire</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Nom</label>
+                        <input type="text" name="name" class="form-control" value="{{ $gestionnaire->name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Prénom</label>
+                        <input type="text" name="prenom" class="form-control" value="{{ $gestionnaire->prenom }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ $gestionnaire->email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Service</label>
+                        <input type="text" name="service" class="form-control" value="{{ $gestionnaire->service }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach

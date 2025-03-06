@@ -21,27 +21,47 @@ class AdminController extends Controller
 
     public function createGestionnaire(Request $request) {
         $request->validate([
-            'nom' => 'required',
-            'prenom' => 'required',
+            'name' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'service' => 'required',
+            'service' => 'required|string|max:255',
         ]);
-
+    
         User::create([
-            'nom' => $request->nom,
+            'name' => $request->name,
             'prenom' => $request->prenom,
             'email' => $request->email,
             'service' => $request->service,
             'role' => 'gestionnaire',
-            'password' => Hash::make('password123') // Mot de passe par défaut
+            'password' => Hash::make('password123'), // Mot de passe par défaut
+            'password_changed' => false, // L'utilisateur doit changer son mot de passe
         ]);
-
+    
         return back()->with('success', 'Gestionnaire ajouté avec succès');
     }
 
+    // public function updateGestionnaire(Request $request, $id) {
+    //     $gestionnaire = User::findOrFail($id);
+    //     $gestionnaire->update($request->all());
+    //     return back()->with('success', 'Gestionnaire mis à jour');
+    // }
+
     public function updateGestionnaire(Request $request, $id) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'service' => 'required|string|max:255',
+        ]);
+    
         $gestionnaire = User::findOrFail($id);
-        $gestionnaire->update($request->all());
+        $gestionnaire->update([
+            'name' => $request->name,
+            'prenom' => $request->prenom,
+            'email' => $request->email,
+            'service' => $request->service,
+        ]);
+    
         return back()->with('success', 'Gestionnaire mis à jour');
     }
 
@@ -50,8 +70,18 @@ class AdminController extends Controller
         return back()->with('success', 'Gestionnaire supprimé');
     }
 
+    // public function resetPassword($id) {
+    //     User::findOrFail($id)->update(['password' => Hash::make('password123')]);
+    //     return back()->with('success', 'Mot de passe réinitialisé');
+    // }
+
     public function resetPassword($id) {
-        User::findOrFail($id)->update(['password' => Hash::make('password123')]);
+        $gestionnaire = User::findOrFail($id);
+        $gestionnaire->update([
+            'password' => Hash::make('password123'),
+            'password_changed' => false, // L'utilisateur doit changer son mot de passe
+        ]);
+    
         return back()->with('success', 'Mot de passe réinitialisé');
     }
 
@@ -123,6 +153,25 @@ class AdminController extends Controller
         $audits = Audit::orderBy('created_at', 'desc')->get();
         return view('admin.audit', compact('audits'));
     }
+
+    public function dashboard() {
+        // Récupérer tous les gestionnaires
+        $gestionnaires = User::where('role', 'gestionnaire')->get();
+    
+        // Récupérer toutes les sociétés
+        $societes = Societe::all();
+
+        // Récupérer tous les modèles
+        $modeles = Modele::all();
+
+        $signataires = Signataire::all(); // Récupérer les signataires
+
+        // Récupérer tous les audits
+        $audits = Audit::orderBy('created_at', 'desc')->get();
+
+        // Passer les données à la vue
+        return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits'));
+        }
 
     
 }

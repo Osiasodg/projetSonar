@@ -1,6 +1,3 @@
-@extends('layouts.app')
-
-@section('content')
 <div class="container mt-5">
     <h2 class="text-center">Tableau de Bord - Administrateur</h2>
 
@@ -24,30 +21,29 @@
     </ul>
 
     <div class="tab-content mt-3" id="adminTabsContent">
-        <!-- Gestionnaires -->
-        <div class="tab-pane fade show active" id="gestionnaire" role="tabpanel">
-            @include('admin.gestionnaires')
-        </div>
+    <!-- Gestionnaires -->
+    <div class="tab-pane fade show active" id="gestionnaire" role="tabpanel">
+        @include('admin.gestionnaires', ['gestionnaires' => $gestionnaires])
+    </div>
 
-        <!-- Sociétés -->
-        <div class="tab-pane fade" id="societe" role="tabpanel">
-            @include('admin.societes')
-        </div>
+    <!-- Sociétés -->
+    <div class="tab-pane fade" id="societe" role="tabpanel">
+        @include('admin.societes', ['societes' => $societes])
+    </div>
 
-        <!-- Signataires -->
-        <div class="tab-pane fade" id="signataire" role="tabpanel">
-            @include('admin.signataires')
-        </div>
+    <!-- Signataires -->
+    <div class="tab-pane fade" id="signataire" role="tabpanel">
+        @include('admin.signataires', ['signataires' => $signataires])
+    </div>
 
-        <!-- Modèles -->
-        <div class="tab-pane fade" id="modele" role="tabpanel">
-            @include('admin.modeles')
-        </div>
+    <!-- Modèles -->
+    <div class="tab-pane fade" id="modele" role="tabpanel">
+        @include('admin.modeles', ['modeles' => $modeles])
+    </div>
 
-        <!-- Journal d'Audit -->
-        <div class="tab-pane fade" id="audit" role="tabpanel">
-            @include('admin.audit')
-        </div>
+    <!-- Journal d'Audit -->
+    <div class="tab-pane fade" id="audit" role="tabpanel">
+        @include('admin.audit', ['audits' => $audits])
     </div>
 </div>
-@endsection
+
