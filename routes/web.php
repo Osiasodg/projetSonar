@@ -77,9 +77,7 @@ Route::middleware(['auth'])->group(function () {
 // Routes pour les administrateurs
 // ----------------------------
 
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     Route::get('/gestionnaire', function () {
         return view('gestionnaire.dashboard');
