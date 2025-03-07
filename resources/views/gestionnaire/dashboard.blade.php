@@ -22,7 +22,8 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Logo de l'entreprise</label>
-                        <input type="file" name="logo" class="form-control" required>
+                        <input type="file" name="logo" class="form-control" accept="image/*" required>
+
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Entité</label>

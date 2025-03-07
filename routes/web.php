@@ -57,10 +57,6 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::middleware(['auth'])->group(function () {
     Route::get('/change-password', [PasswordController::class, 'showChangeForm'])->name('password.change');
    // Route::post('/change-password', [PasswordController::class, 'changePassword'])->name('password.update');
-
-   //previsualisé le fichiers excel selectionné
-   Route::post('/gestionnaire/preview', [GestionnaireController::class, 'preview'])->name('gestionnaire.preview');
-
 });
 
 // ----------------------------
@@ -81,7 +77,9 @@ Route::middleware(['auth'])->group(function () {
 // Routes pour les administrateurs
 // ----------------------------
 
-Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
 
     Route::get('/gestionnaire', function () {
         return view('gestionnaire.dashboard');
@@ -134,8 +132,4 @@ Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.das
 
     // Journal d'audit
     Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
-
-    
-    Route::get('/gestionnaire/template', [GestionnaireController::class, 'template'])->name('gestionnaire.template');
-    Route::post('/gestionnaires/update/{id}', [AdminController::class, 'updateGestionnaire'])->name('admin.gestionnaires.update');
 //});
