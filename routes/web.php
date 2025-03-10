@@ -61,15 +61,22 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 // Routes protégées par authentification
 // ----------------------------
 
-// Changement de mot de passe
 Route::middleware(['auth'])->group(function () {
+    // Afficher le formulaire de changement de mot de passe
     Route::get('/change-password', [PasswordController::class, 'showChangeForm'])->name('password.change');
-   // Route::post('/change-password', [PasswordController::class, 'changePassword'])->name('password.update');
+    
+    // Traiter le changement de mot de passe
+    Route::post('/change-password', [PasswordController::class, 'changePassword'])->name('password.update');
 });
+
+
 
 // ----------------------------
 // Routes pour les gestionnaires
 // ----------------------------
+
+// Redirection vers le tableau de bord du gestionnaire
+Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
 
 //Route::prefix('gestionnaire')->middleware(['auth', 'force.password.change', 'role:gestionnaire'])->group(function () {
     // Tableau de bord des gestionnaires
@@ -116,7 +123,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/gestionnaires/create', [AdminController::class, 'createGestionnaire'])->name('admin.gestionnaires.create');
     Route::post('/gestionnaires/update/{id}', [AdminController::class, 'updateGestionnaire'])->name('admin.gestionnaires.update');
     Route::post('/gestionnaires/delete/{id}', [AdminController::class, 'deleteGestionnaire'])->name('admin.gestionnaires.delete');
-    Route::post('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset');
+   // Route::post('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset');
+    Route::put('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset-password');
 
     // Gestion des sociétés
     Route::get('/societes', [AdminController::class, 'societes'])->name('admin.societes');

@@ -21,26 +21,26 @@ class PasswordController extends Controller
         $request->validate([
             'current_password' => 'required',
             'new_password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Le mot de passe actuel est obligatoire.',
+            'new_password.required' => 'Le nouveau mot de passe est obligatoire.',
+            'new_password.min' => 'Le mot de passe doit contenir au moins 8 caractères.',
+            'new_password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
         ]);
 
         $user = Auth::user();
 
-        // Vérifier le mot de passe actuel
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Le mot de passe actuel est incorrect.']);
         }
 
-        // Mettre à jour le mot de passe
-        // ... validation ...
-
         $user->update([
             'password' => Hash::make($request->new_password),
-            'password_changed' => true // <-- Activer le flag
+            'password_changed' => true,
         ]);
 
-        return redirect()->route('gestionnaire.dashboard'); // <-- Redirection finale
+        //return redirect()->route('gestionnaire.dashboard')->with('success', 'Mot de passe mis à jour avec succès.');
+        return redirect()->route('password.change')->with('success', true);
 
-        // Rediriger vers le tableau de bord du gestionnaire
-        return redirect()->route('gestionnaire.dashboard')->with('success', 'Mot de passe mis à jour avec succès.');
     }
 }

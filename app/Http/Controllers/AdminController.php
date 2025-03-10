@@ -75,14 +75,20 @@ class AdminController extends Controller
     //     return back()->with('success', 'Mot de passe réinitialisé');
     // }
 
-    public function resetPassword($id) {
+
+    public function resetPassword($id)
+    {
+        // Trouver le gestionnaire par son ID
         $gestionnaire = User::findOrFail($id);
+
+        // Réinitialiser le mot de passe à une valeur par défaut (par exemple, "password123")
         $gestionnaire->update([
-            'password' => Hash::make('password123'),
-            'password_changed' => false, // L'utilisateur doit changer son mot de passe
+            'password' => Hash::make('password123'), // Mot de passe par défaut
+            'password_changed' => false, // Marquer que le mot de passe doit être changé
         ]);
-    
-        return back()->with('success', 'Mot de passe réinitialisé');
+
+        // Rediriger avec un message de succès
+        return redirect()->back()->with('success', 'Le mot de passe a été réinitialisé avec succès.');
     }
 
     // Gestion des sociétés

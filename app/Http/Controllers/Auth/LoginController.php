@@ -47,6 +47,26 @@ class LoginController extends Controller
     } 
 
 
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ], [
+            'email.required' => 'L\'adresse email est obligatoire.',
+            'email.email' => 'L\'adresse email n\'est pas valide.',
+            'password.required' => 'Le mot de passe est obligatoire.',
+        ]);
+
+        if (Auth::attempt($request->only('email', 'password'))) {
+            return $this->authenticated($request);
+        }
+
+        return back()->with('error', 'Email ou mot de passe incorrect.');
+    }
+
+
+
     protected function authenticated(Request $request)
     {
         $user = Auth::user();
@@ -69,5 +89,8 @@ class LoginController extends Controller
         }
 
         
+
+        
+
     }
 }

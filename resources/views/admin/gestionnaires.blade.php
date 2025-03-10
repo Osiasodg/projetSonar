@@ -6,6 +6,19 @@
         </button>
     </div>
     <div class="card-body">
+        <!-- Messages de succès ou d'erreur -->
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
@@ -25,6 +38,7 @@
                         <td>{{ $gestionnaire->email }}</td>
                         <td>{{ $gestionnaire->service }}</td>
                         <td>
+                            <!-- Bouton Modifier -->
                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" 
                                     data-bs-target="#editGestionnaireModal{{ $gestionnaire->id }}"
                                     data-id="{{ $gestionnaire->id }}"
@@ -34,11 +48,22 @@
                                     data-service="{{ $gestionnaire->service }}">
                                 <i class="fas fa-edit"></i>
                             </button>
+
+                            <!-- Bouton Supprimer -->
                             <form action="{{ route('admin.gestionnaires.delete', $gestionnaire->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                            <!-- Bouton Réinitialiser le mot de passe -->
+                            <form action="{{ route('admin.gestionnaires.reset-password', $gestionnaire->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="btn btn-sm btn-info" title="Réinitialiser le mot de passe">
+                                    <i class="fas fa-key"></i>
                                 </button>
                             </form>
                         </td>
