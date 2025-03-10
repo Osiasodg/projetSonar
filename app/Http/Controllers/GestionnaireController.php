@@ -16,7 +16,8 @@ class GestionnaireController extends Controller
     // Affiche le tableau de bord du gestionnaire
     public function index()
     {
-        return view('gestionnaire.dashboard');
+        //return view('gestionnaire.dashboard');
+        return view('gestionnaire.dashboard', ['showNavbar' => true]); // Afficher la navbar
     }
 
 

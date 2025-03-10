@@ -34,10 +34,18 @@ Route::get('/verifier', function () {
 })->name('verifier.form');
 
 // Affichage du formulaire de vérification des bons (alternative)
-Route::get('/bons/verifier', [BonController::class, 'showForm'])->name('bons.form');
+// Afficher le formulaire
+Route::get('/verifier-bon', [BonController::class, 'showForm'])->name('bons.showForm');
+//Route::get('/bons/verifier', [BonController::class, 'showForm'])->name('bons.form');
+
+// Vérifier le bon (sans le valider)
+Route::post('/verifier-bon', [BonController::class, 'verifier'])->name('bons.verifier');
+
+// Valider le bon (marquer comme utilisé)
+Route::post('/valider-bon', [BonController::class, 'valider'])->name('bons.valider');
 
 // Traitement de la vérification des bons
-Route::post('/verifier', [BonController::class, 'verifier'])->name('bons.verifier');
+//Route::post('/verifier', [BonController::class, 'verifier'])->name('bons.verifier');
 
 // ----------------------------
 // Routes d'authentification (gestionnaires/admin)

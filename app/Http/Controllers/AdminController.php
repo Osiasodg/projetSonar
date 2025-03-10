@@ -171,6 +171,7 @@ class AdminController extends Controller
 
         // Passer les données à la vue
         return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits'));
+        //return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits') + ['showNavbar' => true]);
         }
 
     

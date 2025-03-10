@@ -5,15 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Bon;
 use Carbon\Carbon;
-use App\Imports\BonsAchatImport;
-
-use Maatwebsite\Excel\Facades\Excel;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Barryvdh\DomPDF\Facade\Pdf;
-
 
 class BonController extends Controller
 {
+    // Vérifie le bon sans le marquer comme utilisé
     public function verifier(Request $request)
     {
         $request->validate(['numero' => 'required|string']);
@@ -21,20 +16,44 @@ class BonController extends Controller
         $bon = Bon::where('numero', $request->numero)->first();
 
         if (!$bon) {
-            return back()->with('error', 'Aucun bon trouvé avec ce numéro');
+            return back()->with('error', 'Bon invalide'); //numéro introuvable
         }
 
-        // Vérification de la date de validité
         if (Carbon::parse($bon->date_validite)->isPast()) {
-            return back()->with('error', 'Bon invalide');
+            return back()->with('error', 'Bon invalide (date expirée)'); //date expirée
         }
 
-        // Vérification de l'état d'utilisation
         if ($bon->utilise) {
-            return back()->with('error', 'Bon invalide (déjà utilisé)');
+            return back()->with('error', 'Bon déjà utilisé');
         }
 
-        // Mise à jour du bon comme "utilisé"
+        // Renvoie le bon valide sans le marquer comme utilisé
+        return back()->with([
+            'success' => 'Bon valide',
+            'bon' => $bon // On passe le bon à la vue
+        ]);
+    }
+
+    // Valide le bon (le marque comme utilisé)
+    public function valider(Request $request)
+    {
+        $request->validate(['numero' => 'required|string']);
+
+        $bon = Bon::where('numero', $request->numero)->first();
+
+        if (!$bon) {
+            return back()->with('error', 'Bon invalide (numéro introuvable)');
+        }
+
+        if (Carbon::parse($bon->date_validite)->isPast()) {
+            return back()->with('error', 'Bon invalide (date expirée)');
+        }
+
+        if ($bon->utilise) {
+            return back()->with('error', 'Bon déjà utilisé');
+        }
+
+        // Marque le bon comme utilisé
         $bon->update([
             'utilise' => true,
             'date_validation' => Carbon::now()
@@ -43,8 +62,9 @@ class BonController extends Controller
         return back()->with('success', 'Bon validé avec succès');
     }
 
+    // Affiche le formulaire
     public function showForm()
     {
-        return view('bons.verifier'); // Charge la vue du formulaire
+        return view('bons.verifier');
     }
 }
