@@ -121,8 +121,10 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
     // Gestion des gestionnaires
     Route::get('/gestionnaires', [AdminController::class, 'gestionnaires'])->name('admin.gestionnaires');
     Route::post('/gestionnaires/create', [AdminController::class, 'createGestionnaire'])->name('admin.gestionnaires.create');
-    Route::post('/gestionnaires/update/{id}', [AdminController::class, 'updateGestionnaire'])->name('admin.gestionnaires.update');
-    Route::post('/gestionnaires/delete/{id}', [AdminController::class, 'deleteGestionnaire'])->name('admin.gestionnaires.delete');
+    Route::put('/gestionnaires/update/{id}', [AdminController::class, 'updateGestionnaire'])->name('admin.gestionnaires.update');
+    //Route::post('/gestionnaires/delete/{id}', [AdminController::class, 'deleteGestionnaire'])->name('admin.gestionnaires.delete');
+    Route::delete('/admin/gestionnaires/delete/{id}', [AdminController::class, 'deleteGestionnaire'])->name('admin.gestionnaires.delete');
+
    // Route::post('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset');
     Route::put('/gestionnaires/reset-password/{id}', [AdminController::class, 'resetPassword'])->name('admin.gestionnaires.reset-password');
 

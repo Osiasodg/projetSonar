@@ -45,7 +45,7 @@
                                     data-name="{{ $gestionnaire->name }}"
                                     data-prenom="{{ $gestionnaire->prenom }}"
                                     data-email="{{ $gestionnaire->email }}"
-                                    data-service="{{ $gestionnaire->service }}">
+                                    data-service="{{ $gestionnaire->service }}" title="Modifier">
                                 <i class="fas fa-edit"></i>
                             </button>
 
@@ -53,7 +53,7 @@
                             <form action="{{ route('admin.gestionnaires.delete', $gestionnaire->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Supprimer gestionnaire">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

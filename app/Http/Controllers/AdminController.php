@@ -67,7 +67,7 @@ class AdminController extends Controller
 
     public function deleteGestionnaire($id) {
         User::findOrFail($id)->delete();
-        return back()->with('success', 'Gestionnaire supprimé');
+        return back()->with('success', 'Le Gestionnaire à été supprimé!');
     }
 
     // public function resetPassword($id) {
@@ -87,8 +87,11 @@ class AdminController extends Controller
             'password_changed' => false, // Marquer que le mot de passe doit être changé
         ]);
 
-        // Rediriger avec un message de succès
-        return redirect()->back()->with('success', 'Le mot de passe a été réinitialisé avec succès.');
+        /// Rediriger avec un message de succès contenant le nom et prénom
+        return redirect()->back()->with(
+            'success',
+            "Le mot de passe de {$gestionnaire->prenom} {$gestionnaire->name} a été réinitialisé avec succès."
+        );
     }
 
     // Gestion des sociétés
