@@ -37,7 +37,8 @@ class AdminController extends Controller
             'password_changed' => false, // L'utilisateur doit changer son mot de passe
         ]);
     
-        return back()->with('success', 'Gestionnaire ajouté avec succès');
+        //return back()->with('success', 'Gestionnaire ajouté avec succès');
+        return redirect()->route('admin.gestionnaires')->with('success', 'Gestionnaire ajouté avec succès');
     }
 
     // public function updateGestionnaire(Request $request, $id) {
@@ -67,7 +68,8 @@ class AdminController extends Controller
 
     public function deleteGestionnaire($id) {
         User::findOrFail($id)->delete();
-        return back()->with('success', 'Le Gestionnaire à été supprimé!');
+        //return back()->with('success', 'Le Gestionnaire à été supprimé!');
+        return redirect()->route('admin.gestionnaires')->with('success', 'Le Gestionnaire a été supprimé!');
     }
 
     // public function resetPassword($id) {
@@ -88,7 +90,7 @@ class AdminController extends Controller
         ]);
 
         /// Rediriger avec un message de succès contenant le nom et prénom
-        return redirect()->back()->with(
+        return redirect()->route('admin.gestionnaires')->with(
             'success',
             "Le mot de passe de {$gestionnaire->prenom} {$gestionnaire->name} a été réinitialisé avec succès."
         );
@@ -102,17 +104,20 @@ class AdminController extends Controller
 
     public function createSociete(Request $request) {
         Societe::create($request->all());
-        return back()->with('success', 'Société ajoutée');
+        //return back()->with('success', 'Société ajoutée');
+        return redirect()->route('admin.societes')->with('success', 'Société ajoutée');
     }
 
     public function updateSociete(Request $request, $id) {
         Societe::findOrFail($id)->update($request->all());
-        return back()->with('success', 'Société mise à jour');
+        //return back()->with('success', 'Société mise à jour');
+        return redirect()->route('admin.societes')->with('success', 'Société mise à jour');
     }
 
     public function deleteSociete($id) {
         Societe::findOrFail($id)->delete();
-        return back()->with('success', 'Société supprimée');
+        //return back()->with('success', 'Société supprimée');
+        return redirect()->route('admin.societes')->with('success', 'Société supprimée');
     }
 
     // Gestion des signataires
@@ -121,9 +126,27 @@ class AdminController extends Controller
         return view('admin.signataires', compact('signataires'));
     }
 
+    // public function createSignataire(Request $request) {
+    //     Signataire::create($request->all());
+    //     return back()->with('success', 'Signataire ajouté');
+    // }
     public function createSignataire(Request $request) {
-        Signataire::create($request->all());
-        return back()->with('success', 'Signataire ajouté');
+        // Valider les données du formulaire
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'poste' => 'required|string|max:255',
+        ]);
+    
+        // Créer un nouveau signataire
+        Signataire::create([
+            'nom' => $request->nom,
+            'prenom' => $request->prenom,
+            'poste' => $request->poste,
+        ]);
+    
+        // Rediriger avec un message de succès
+        return back()->with('success', 'Signataire ajouté avec succès.');
     }
 
     public function updateSignataire(Request $request, $id) {
@@ -163,25 +186,30 @@ class AdminController extends Controller
         return view('admin.audit', compact('audits'));
     }
 
-    public function dashboard() {
-        // Récupérer tous les gestionnaires
-        $gestionnaires = User::where('role', 'gestionnaire')->get();
+    public function dashboard()
+    {
+        return view('admin.dashboard');
+    }
+
+    // public function dashboard() {
+    //     // Récupérer tous les gestionnaires
+    //     $gestionnaires = User::where('role', 'gestionnaire')->get();
     
-        // Récupérer toutes les sociétés
-        $societes = Societe::all();
+    //     // Récupérer toutes les sociétés
+    //     $societes = Societe::all();
 
-        // Récupérer tous les modèles
-        $modeles = Modele::all();
+    //     // Récupérer tous les modèles
+    //     $modeles = Modele::all();
 
-        $signataires = Signataire::all(); // Récupérer les signataires
+    //     $signataires = Signataire::all(); // Récupérer les signataires
 
-        // Récupérer tous les audits
-        $audits = Audit::orderBy('created_at', 'desc')->get();
+    //     // Récupérer tous les audits
+    //     $audits = Audit::orderBy('created_at', 'desc')->get();
 
-        // Passer les données à la vue
-        return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits'));
-        //return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits') + ['showNavbar' => true]);
-        }
+    //     // Passer les données à la vue
+    //     return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits'));
+    //     //return view('admin.dashboard', compact('gestionnaires', 'societes', 'modeles', 'signataires', 'audits') + ['showNavbar' => true]);
+    //     }
 
     
 }

@@ -30,6 +30,12 @@ class User extends Authenticatable
         'password_changed'
     ];
 
+    public function isAdmin()
+    {
+        // Par exemple, vérifiez si l'utilisateur a un rôle "admin"
+        return $this->role === 'admin'; // Remplacez 'admin' par la logique appropriée
+    }
+
     protected $guard_name = 'web'; // or whatever guard you want to use
 
     /**

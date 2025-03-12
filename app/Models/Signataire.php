@@ -12,9 +12,7 @@ class Signataire extends Model
     protected $fillable = [
         'nom',
         'prenom',
-        'email',
         'poste',
-        'societe_id'
     ];
 
     public function societe()

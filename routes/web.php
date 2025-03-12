@@ -131,21 +131,26 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
     // Gestion des sociétés
     Route::get('/societes', [AdminController::class, 'societes'])->name('admin.societes');
     Route::post('/societes/create', [AdminController::class, 'createSociete'])->name('admin.societes.create');
-    Route::post('/societes/update/{id}', [AdminController::class, 'updateSociete'])->name('admin.societes.update');
-    Route::post('/societes/delete/{id}', [AdminController::class, 'deleteSociete'])->name('admin.societes.delete');
+   // Route::post('/societes/update/{id}', [AdminController::class, 'updateSociete'])->name('admin.societes.update');
+    Route::put('/societes/update/{id}', [AdminController::class, 'updateSociete'])->name('admin.societes.update');
+    Route::delete('/societes/delete/{id}', [AdminController::class, 'deleteSociete'])->name('admin.societes.delete');
+
 
     // Gestion des signataires
     Route::get('/signataires', [AdminController::class, 'signataires'])->name('admin.signataires');
     Route::post('/signataires/create', [AdminController::class, 'createSignataire'])->name('admin.signataires.create');
-    Route::post('/signataires/update/{id}', [AdminController::class, 'updateSignataire'])->name('admin.signataires.update');
-    Route::post('/signataires/delete/{id}', [AdminController::class, 'deleteSignataire'])->name('admin.signataires.delete');
+    Route::put('/signataires/update/{id}', [AdminController::class, 'updateSignataire'])->name('admin.signataires.update');
+    Route::delete('/signataires/delete/{id}', [AdminController::class, 'deleteSignataire'])->name('admin.signataires.delete');
 
     // Gestion des modèles
     Route::get('/modeles', [AdminController::class, 'modeles'])->name('admin.modeles');
     Route::post('/modeles/create', [AdminController::class, 'createModele'])->name('admin.modeles.create');
-    Route::post('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
-    Route::post('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
+    Route::put('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
+    Route::delete('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
 
     // Journal d'audit
-    Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
+   // Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
+    Route::get('/admin/audit', [AdminController::class, 'audit'])->name('admin.audit');
+
+
 //});

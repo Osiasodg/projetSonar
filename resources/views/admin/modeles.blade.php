@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!-- resources/views/admin/modeles.blade.php -->
 <div class="card shadow mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -66,3 +69,4 @@
         </div>
     </div>
 </div>
+@endsection
