@@ -19,13 +19,16 @@
                     <label class="form-label">Logo de l'entreprise</label>
                     <input type="file" name="logo" class="form-control" accept="image/*" required>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label">Entité</label>
+                    <label class="form-label">Societé</label>
                     <select name="entite" class="form-select" required>
-                        <option value="SONAR VIE">SONAR VIE</option>
-                        <option value="SONAR-IARD">SONAR-IARD</option>
+                        @foreach($societes as $societe)
+                            <option value="{{ $societe->nom }}">{{ $societe->nom }}</option>
+                        @endforeach
                     </select>
                 </div>
+
                 <div class="mb-3">
                     <label class="form-label">Date de validité</label>
                     <input type="date" name="date_validite" class="form-control" required>

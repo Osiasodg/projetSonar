@@ -131,22 +131,14 @@ class AdminController extends Controller
     //     return back()->with('success', 'Signataire ajouté');
     // }
     public function createSignataire(Request $request) {
-        // Valider les données du formulaire
         $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'poste' => 'required|string|max:255',
+            'poste' => 'required|string|max:255', // Nouveau champ
         ]);
     
-        // Créer un nouveau signataire
-        Signataire::create([
-            'nom' => $request->nom,
-            'prenom' => $request->prenom,
-            'poste' => $request->poste,
-        ]);
-    
-        // Rediriger avec un message de succès
-        return back()->with('success', 'Signataire ajouté avec succès.');
+        Signataire::create($request->all());
+        return back()->with('success', 'Signataire ajouté');
     }
 
     public function updateSignataire(Request $request, $id) {

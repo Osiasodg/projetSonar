@@ -94,9 +94,9 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
 
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-    Route::get('/gestionnaire', function () {
-        return view('gestionnaire.dashboard');
-    })->name('gestionnaire.dashboard');
+    // Route::get('/gestionnaire', function () {
+    //     return view('gestionnaire.dashboard');
+    // })->name('gestionnaire.dashboard');
 
 
     // Importation de fichiers Excel
@@ -145,12 +145,9 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
     // Gestion des modèles
     Route::get('/modeles', [AdminController::class, 'modeles'])->name('admin.modeles');
     Route::post('/modeles/create', [AdminController::class, 'createModele'])->name('admin.modeles.create');
-    Route::put('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
-    Route::delete('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
+    Route::post('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
+    Route::post('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
 
     // Journal d'audit
-   // Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
-    Route::get('/admin/audit', [AdminController::class, 'audit'])->name('admin.audit');
-
-
+    Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
 //});

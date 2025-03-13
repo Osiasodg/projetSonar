@@ -8,6 +8,7 @@ use App\Imports\BonsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\Societe; 
 
 
 class GestionnaireController extends Controller
@@ -17,7 +18,12 @@ class GestionnaireController extends Controller
     public function index()
     {
         //return view('gestionnaire.dashboard');
-        return view('gestionnaire.dashboard', ['showNavbar' => true]); // Afficher la navbar
+        //return view('gestionnaire.dashboard', ['showNavbar' => true]); // Afficher la navbar
+        $societes = Societe::all(); // Récupération des sociétés
+        return view('gestionnaire.dashboard', [
+            'showNavbar' => true,
+            'societes' => $societes
+        ]);
     }
 
 
