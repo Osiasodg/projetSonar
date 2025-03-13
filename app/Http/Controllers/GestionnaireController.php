@@ -8,7 +8,8 @@ use App\Imports\BonsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use App\Models\Societe; 
+use App\Models\Societe;
+use App\Models\Signataire; 
 
 
 class GestionnaireController extends Controller
@@ -20,9 +21,14 @@ class GestionnaireController extends Controller
         //return view('gestionnaire.dashboard');
         //return view('gestionnaire.dashboard', ['showNavbar' => true]); // Afficher la navbar
         $societes = Societe::all(); // Récupération des sociétés
+        // Récupérer tous les signataires depuis la base de données
+        $signataires = Signataire::all();
+
+        // Passer les données à la vue
         return view('gestionnaire.dashboard', [
             'showNavbar' => true,
-            'societes' => $societes
+            'societes' => $societes,
+            'signataires' => $signataires 
         ]);
     }
 
@@ -54,7 +60,8 @@ class GestionnaireController extends Controller
             'entite' => 'required|string',
             'date_validite' => 'required|date',
             'recepteur' => 'required|string',
-            'telephone' => 'required|string'
+            'telephone' => 'required|string',
+            'signataire_id' => 'required|exists:signataires,id'
         ]);
 
         // Enregistrer le logo et récupérer son chemin
@@ -85,6 +92,7 @@ class GestionnaireController extends Controller
                 'entite' => $validated['entite'],
                 'logo_path' => $logoPath,
                 'user_id' => auth()->id() ?? 1, // Ajoute l'ID de l'utilisateur connecté, ou une valeur par défaut
+                'signataire_id' => $validated['signataire_id'] // Enregistre l'ID du signataire
             ]);
 
             // Ajouter le bon importé au tableau
@@ -116,6 +124,9 @@ class GestionnaireController extends Controller
         // Créer un tableau pour stocker les chemins des QR Codes
         $qrCodes = [];
 
+        // Créer un tableau pour stocker les informations des signataires
+         $signataires = [];
+
         // Générer le QR Code pour chaque bon
         foreach ($bons as $bon) {
             $qrData = "BON D'ACHAT N°: {$bon->numero}\n";
@@ -129,6 +140,9 @@ class GestionnaireController extends Controller
 
             // Stocker le chemin du QR Code
             $qrCodes[$bon->id] = $qrPath;
+
+            // Récupérer les informations du signataire
+             $signataires[$bon->id] = $bon->signataire; // Utilise la relation définie dans le modèle Bon
         }
 
         // Récupérer le chemin du logo
@@ -142,11 +156,27 @@ class GestionnaireController extends Controller
             'qrCodes' => $qrCodes, // On passe maintenant un tableau de QR Codes
             'logoPath' => $logoPath,
             'entite' => $bons->first()->entite ?? 'Entité Inconnue', // Remplace par la bonne valeur
-            'directeur' => 'Thomas ZONGO' // Remplace par une valeur dynamique si nécessaire
+            'directeur' => 'Thomas ZONGO', // Remplace par une valeur dynamique si nécessaire
+            'signataires' => $signataires // Passer les informations des signataires
         ]);
 
         // Télécharger le PDF unique contenant tous les bons
         return $pdf->download('bons-pdf.pdf');
+    }
+
+    public function signataire()
+    {
+        return $this->belongsTo(Signataire::class, 'signataire_id');
+    }
+
+    //methode pour vider la session et actualiser la page gestionnaire/dashboard.blade
+    public function clearSession(Request $request)
+    {
+        // Vider les données de session
+        $request->session()->forget(['importedBons', 'bons']);
+        
+        // Rediriger vers le tableau de bord
+        return redirect()->route('gestionnaire.dashboard');
     }
 
 }

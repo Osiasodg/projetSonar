@@ -92,10 +92,14 @@
                 A retourner à la <strong>{{ $entite }}</strong> accompagné de la facture pour règlement.
             </div>
 
-            <!-- Signature du Directeur -->
+            <!-- Signature du Signataire -->
             <div class="signature">
-                <p>{{ strtoupper($directeur) }}</p>
-                <p><u>DIRECTEUR GÉNÉRAL</u></p>
+                @if ($signataires[$bon->id])
+                    <p>{{ $signataires[$bon->id]->nom }} {{ $signataires[$bon->id]->prenom }}</p>
+                    <p><u>{{ $signataires[$bon->id]->poste }}</u></p>
+                @else
+                    <p>Signataire non défini</p>
+                @endif
             </div>
         </div>
     @endforeach

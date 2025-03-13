@@ -11,17 +11,17 @@
             <form action="{{ route('gestionnaire.import') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label">Fichier Excel (.xlsx, .xls)</label>
+                    <label class="form-label fw-bold">Fichier Excel (.xlsx, .xls)</label>
                     <input type="file" id="fileInput" name="file" class="form-control" accept=".xlsx,.xls" required>
                     <p id="fileError" class="text-danger mt-2" style="display: none;">Veuillez sélectionner un fichier Excel (.xls ou .xlsx).</p>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Logo de l'entreprise</label>
+                    <label class="form-label fw-bold">Logo de l'entreprise</label>
                     <input type="file" name="logo" class="form-control" accept="image/*" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Societé</label>
+                    <label class="form-label fw-bold">Societé</label>
                     <select name="entite" class="form-select" required>
                         @foreach($societes as $societe)
                             <option value="{{ $societe->nom }}">{{ $societe->nom }}</option>
@@ -30,17 +30,26 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Date de validité</label>
+                    <label class="form-label fw-bold">Date de validité</label>
                     <input type="date" name="date_validite" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Récepteur du bon</label>
+                    <label class="form-label fw-bold">Récepteur du bon</label>
                     <input type="text" name="recepteur" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Téléphone du récepteur</label>
+                    <label class="form-label fw-bold">Téléphone du récepteur</label>
                     <input type="text" name="telephone" class="form-control" required>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Signataire</label>
+                    <select name="signataire_id" class="form-select" required>
+                        @foreach($signataires as $signataire)
+                            <option value="{{ $signataire->id }}">{{ $signataire->nom }} {{ $signataire->prenom }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-success">Importer</button>
             </form>
         </div>
@@ -55,7 +64,7 @@
 
     <!-- Aperçu après importation -->
     @if(session('bons') && count(session('bons')) > 0)
-        <div class="card shadow mt-4">
+        <div id="bons-section" class="card shadow mt-4">
             <div class="card-header bg-info text-white">
                 <h3 class="mb-0">Aperçu des bénéficiaires ({{ count(session('bons')) }})</h3>
             </div>
@@ -83,16 +92,29 @@
                     </table>
                 </div>
 
-                <!-- Bouton Générer PDF -->
-                <form action="{{ route('generate.pdfs') }}" method="POST" class="mt-4">
-                    @csrf
-                    @foreach(session('bons') as $bon)
-                        <input type="hidden" name="bon_ids[]" value="{{ $bon->id }}">
-                    @endforeach
-                    <button type="submit" class="btn btn-warning btn-lg">
-                        🖨️ Générer tous les PDF
-                    </button>
-                </form>
+                <!-- Boutons Générer PDF et Actualiser sur la même ligne -->
+                <div class="d-flex gap-3 mt-4">
+                    <!-- Bouton Générer PDF -->
+                    <form action="{{ route('generate.pdfs') }}" method="POST">
+                        @csrf
+                        @foreach(session('bons') as $bon)
+                            <input type="hidden" name="bon_ids[]" value="{{ $bon->id }}">
+                        @endforeach
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            🖨️ Générer tous les PDF
+                        </button>
+                    </form>
+
+                    <!-- Bouton Actualiser -->
+                    <form action="{{ route('clear.session') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            🔄 Actualiser
+                        </button>
+                    </form>
+                </div>
+
+
             </div>
         </div>
     @else
@@ -101,6 +123,18 @@
         </div>
     @endif
 </div>
+
+<!-- JavaScript pour le défilement automatique -->
+@if(session('bons'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bonsSection = document.getElementById('bons-section');
+            if (bonsSection) {
+                bonsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+@endif
 
 <!-- JavaScript pour la validation du fichier -->
 <script>

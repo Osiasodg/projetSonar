@@ -150,4 +150,6 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
 
     // Journal d'audit
     Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
+    // Route pour vider la session dans gestionnaire/dashboard
+    Route::post('/clear-session', [GestionnaireController::class, 'clearSession'])->name('clear.session');
 //});

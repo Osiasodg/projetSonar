@@ -25,6 +25,11 @@ class Bon extends Model
         'telephone',
         'entite',     
         'logo_path', 
-        'user_id' 
+        'user_id' ,
+        'signataire_id'
     ];
+    public function signataire()
+    {
+        return $this->belongsTo(Signataire::class, 'signataire_id');
+    }
 }
