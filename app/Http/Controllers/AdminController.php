@@ -9,6 +9,9 @@ use App\Models\Signataire;
 use App\Models\Modele;
 use App\Models\Audit;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+use App\Models\Bon;
+
 
 
 class AdminController extends Controller
@@ -175,13 +178,52 @@ class AdminController extends Controller
     // Journal d'audit
     public function audit() {
         $audits = Audit::orderBy('created_at', 'desc')->get();
-        return view('admin.audit', compact('audits'));
+        $totalUsers = User::where('role', 'gestionnaire')->count();
+
+        // ✅ Nombre total de bons générés
+        $totalBons = Bon::count();
+
+        // ✅ Montant total des bons générés
+        $montantTotal = Bon::sum('montant');
+
+        // ✅ Nombre total de bons validés
+        $bonsValides = Bon::where('utilise', true)->count();
+
+        // ✅ Montant total des bons validés
+        $montantValide = Bon::where('utilise', true)->sum('montant');
+
+        // ✅ Ajouter les bons validés par mois
+        $bonsParMois = Bon::whereNotNull('date_validation')
+            ->selectRaw('DATE_FORMAT(date_validation, "%Y-%m") as mois, COUNT(*) as total')
+            ->groupBy('mois')
+            ->orderBy('mois', 'asc')
+            ->get()
+            ->pluck('total', 'mois');
+
+            $bonsParUtilisateur = Bon::selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
+            ->groupBy('user_id')
+            ->with('user') // Charge les utilisateurs associés
+            ->get();
+        
+        
+
+        return view('admin.audit', compact(
+            'audits', 
+            'totalUsers', 
+            'totalBons', 
+            'montantTotal', 
+            'bonsValides', 
+            'montantValide', 
+            'bonsParMois',
+            'bonsParUtilisateur'
+        ));
     }
 
     public function dashboard()
     {
         return view('admin.dashboard');
     }
+
 
     // public function dashboard() {
     //     // Récupérer tous les gestionnaires

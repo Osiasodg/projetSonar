@@ -32,4 +32,10 @@ class Bon extends Model
     {
         return $this->belongsTo(Signataire::class, 'signataire_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

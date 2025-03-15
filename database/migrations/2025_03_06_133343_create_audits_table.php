@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up()
     {
+        
+
         Schema::create('audits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('action');
-            $table->text('details');
+            $table->string('action'); // Exemple: "Génération de bon"
+            $table->text('details');  // Détails de l'action
+            $table->decimal('montant', 15, 2)->default(0); // Montant du bon généré
             $table->timestamps();
         });
+        
     }
 
     /**

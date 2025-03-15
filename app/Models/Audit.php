@@ -13,6 +13,7 @@ class Audit extends Model
         'user_id',
         'action',
         'details',
+        'montant', // Nouveau champ pour stocker le montant des bons
     ];
 
     public function user()

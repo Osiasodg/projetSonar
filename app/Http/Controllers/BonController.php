@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Bon;
 use Carbon\Carbon;
+use App\Models\Audit;
+use Illuminate\Support\Facades\Auth;
+
 
 class BonController extends Controller
 {
@@ -59,6 +62,15 @@ class BonController extends Controller
             'date_validation' => Carbon::now()
         ]);
 
+        // Enregistrer l'action dans le journal d'audit
+        //dd(Auth::id(), Auth::user());
+        // Audit::create([
+        //     'user_id' => Auth::id(),
+        //     'action' => 'Validation de bon',
+        //     'details' => "Bon numéro {$bon->numero} validé",
+        //     'montant' => $bon->montant ?? 0, // Enregistre le montant du bon
+        // ]);
+
         return back()->with('success', 'Bon validé avec succès');
     }
 
@@ -67,4 +79,7 @@ class BonController extends Controller
     {
         return view('bons.verifier');
     }
+
+
+    
 }
