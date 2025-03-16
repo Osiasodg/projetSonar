@@ -64,64 +64,82 @@
         </div>
     </div>
 
-    <!-- Graphique des bons générés par mois -->
-    <div class="card">
+    <!-- Formulaire de filtrage par date -->
+    <div class="card mb-4">
         <div class="card-header">
-            <h5 class="card-title"><i class="fas fa-chart-bar"></i> Bons générés par mois</h5>
+            <h5 class="card-title"><i class="fas fa-filter"></i> Filtrer par Date</h5>
         </div>
         <div class="card-body">
-            <canvas id="bonsParMoisChart"></canvas>
+            <form method="GET" action="{{ route('admin.audit') }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="date_debut">Date de début :</label>
+                        <input type="date" name="date_debut" id="date_debut" class="form-control" value="{{ request('date_debut') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="date_fin">Date de fin :</label>
+                        <input type="date" name="date_fin" id="date_fin" class="form-control" value="{{ request('date_fin') }}">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
+
+    <!-- Tableau des bons tirés -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title"><i class="fas fa-list"></i> Liste des Bons Tirés</h5>
+            <p class="text-muted">Nombre total : <strong>{{ $nombreBons }}</strong></p>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Numéro du Bon</th>
+                            <th>Montant</th>
+                            <th>Date de Création</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if(session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        @if($bons->isEmpty())
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Aucun bon trouvé pour cette période.</td>
+                            </tr>
+                        @else
+                            @foreach($bons as $bon)
+                                <tr>
+                                    <td>{{ $bon->numero }}</td>
+                                    <td>{{ number_format($bon->montant, 0, ',', ' ') }} FCFA</td>
+                                    <td>{{ $bon->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        @if($bon->utilise)
+                                            <span class="badge bg-success">Utilisé</span>
+                                        @else
+                                            <span class="badge bg-warning">Non Utilisé</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- Script Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var ctx = document.getElementById('bonsParMoisChart').getContext('2d');
-        var chartData = @json($bonsParMois);
 
-        // Vérifier si on a des données avant d'afficher le graphe
-        if (chartData.length > 0) {
-            var labels = chartData.map(item => `${item.mois}/${item.annee}`);
-            var montantData = chartData.map(item => item.total_montant);
-            var countData = chartData.map(item => item.total_bons);
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Montant Total (FCFA)',
-                            data: montantData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Nombre de Bons',
-                            data: countData,
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        } else {
-            document.getElementById('bonsParMoisChart').style.display = 'none';
-        }
-    });
-</script>
 @endsection

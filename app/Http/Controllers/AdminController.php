@@ -176,9 +176,11 @@ class AdminController extends Controller
     }
 
     // Journal d'audit
-    public function audit() {
+    public function audit(Request $request) {
         $audits = Audit::orderBy('created_at', 'desc')->get();
         $totalUsers = User::where('role', 'gestionnaire')->count();
+        $bons = Bon::orderBy('created_at', 'desc')->get();
+
 
         // ✅ Nombre total de bons générés
         $totalBons = Bon::count();
@@ -192,18 +194,34 @@ class AdminController extends Controller
         // ✅ Montant total des bons validés
         $montantValide = Bon::where('utilise', true)->sum('montant');
 
-        // ✅ Ajouter les bons validés par mois
-        $bonsParMois = Bon::whereNotNull('date_validation')
-            ->selectRaw('DATE_FORMAT(date_validation, "%Y-%m") as mois, COUNT(*) as total')
-            ->groupBy('mois')
-            ->orderBy('mois', 'asc')
-            ->get()
-            ->pluck('total', 'mois');
+        // Récupération des dates du formulaire (si soumises)
+        $dateDebut = $request->input('date_debut');
+        $dateFin = $request->input('date_fin');
 
-            $bonsParUtilisateur = Bon::selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
-            ->groupBy('user_id')
-            ->with('user') // Charge les utilisateurs associés
-            ->get();
+        // Vérification de l'ordre des dates
+        if ($dateDebut && $dateFin && $dateDebut > $dateFin) {
+            return redirect()->route('admin.audit')->with('error', 'La date de fin doit être postérieure à la date de début.');
+        }
+
+        // ✅ Nombre total de bons
+        $nombreBons = Bon::count();
+
+
+        // Récupération et filtrage des bons
+        $query = Bon::orderBy('created_at', 'desc');
+
+        if ($dateDebut && $dateFin) {
+            $query->whereBetween('created_at', [$dateDebut, $dateFin]);
+        } else {
+            // Par défaut, afficher uniquement les 20 derniers bons
+            $query->limit(15);
+        }
+
+
+        $bonsParUtilisateur = Bon::selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
+        ->groupBy('user_id')
+        ->with('user') // Charge les utilisateurs associés
+        ->get();
         
         
 
@@ -214,8 +232,11 @@ class AdminController extends Controller
             'montantTotal', 
             'bonsValides', 
             'montantValide', 
-            'bonsParMois',
-            'bonsParUtilisateur'
+            'bonsParUtilisateur', 
+            'dateDebut', 
+            'dateFin', 
+            'nombreBons',
+            'bons'
         ));
     }
 
