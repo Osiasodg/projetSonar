@@ -177,54 +177,56 @@ class AdminController extends Controller
 
     // Journal d'audit
     public function audit(Request $request) {
+        // Récupération des audits
         $audits = Audit::orderBy('created_at', 'desc')->get();
+    
+        // Statistiques de base
         $totalUsers = User::where('role', 'gestionnaire')->count();
-        $bons = Bon::orderBy('created_at', 'desc')->get();
-
-
-        // ✅ Nombre total de bons générés
         $totalBons = Bon::count();
-
-        // ✅ Montant total des bons générés
         $montantTotal = Bon::sum('montant');
-
-        // ✅ Nombre total de bons validés
+    
+        // Statistiques sur les bons validés
         $bonsValides = Bon::where('utilise', true)->count();
-
-        // ✅ Montant total des bons validés
         $montantValide = Bon::where('utilise', true)->sum('montant');
-
-        // Récupération des dates du formulaire (si soumises)
+    
+        // Récupération des dates du formulaire
         $dateDebut = $request->input('date_debut');
         $dateFin = $request->input('date_fin');
-
-        // Vérification de l'ordre des dates
-        if ($dateDebut && $dateFin && $dateDebut > $dateFin) {
-            return redirect()->route('admin.audit')->with('error', 'La date de fin doit être postérieure à la date de début.');
-        }
-
-        // ✅ Nombre total de bons
-        $nombreBons = Bon::count();
-
-
-        // Récupération et filtrage des bons
-        $query = Bon::orderBy('created_at', 'desc');
-
+    
+        // Validation des dates
         if ($dateDebut && $dateFin) {
-            $query->whereBetween('created_at', [$dateDebut, $dateFin]);
+            $startDate = Carbon::parse($dateDebut);
+            $endDate = Carbon::parse($dateFin);
+    
+            if ($startDate->greaterThan($endDate)) {
+                return redirect()->route('admin.audit')->with('error', 'L\'ordre des dates n\'est pas valide.');
+            }
+        }
+    
+        // Construction de la requête pour les bons
+        $query = Bon::orderBy('created_at', 'desc');
+    
+        // Filtrage par dates si les dates sont fournies
+        if ($dateDebut && $dateFin) {
+            $query->whereBetween('created_at', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay()
+            ]);
         } else {
-            // Par défaut, afficher uniquement les 20 derniers bons
+            // Limite par défaut à 15 résultats si aucun filtre n'est appliqué
             $query->limit(15);
         }
-
-
+    
+        // Récupération des bons filtrés
+        $bons = $query->get();
+        $nombreBons = $bons->count();
+    
+        // Statistiques par utilisateur
         $bonsParUtilisateur = Bon::selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
-        ->groupBy('user_id')
-        ->with('user') // Charge les utilisateurs associés
-        ->get();
-        
-        
-
+            ->groupBy('user_id')
+            ->with('user')
+            ->get();
+    
         return view('admin.audit', compact(
             'audits', 
             'totalUsers', 

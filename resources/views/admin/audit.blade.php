@@ -7,33 +7,56 @@
 
     <!-- Cartes d'informations -->
     <div class="row mb-4">
-        <div class="col-md-4 col-sm-6 mb-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-users"></i> Nombre Total d'Utilisateurs</h5>
-                    <h2 class="card-text">{{ $totalUsers }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-sm-6 mb-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-file-alt"></i> Nombre Total de Bons</h5>
-                    <h2 class="card-text">{{ $totalBons }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 col-sm-12 mb-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-coins"></i> Montant Total des Bons</h5>
-                    <h2 class="card-text">{{ number_format($montantTotal, 0, ',', ' ') }} FCFA</h2>
-                </div>
+    <!-- Carte existante : Nombre Total d'Utilisateurs -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-users"></i> Nombre Total d'Utilisateurs</h5>
+                <h2 class="card-text">{{ $totalUsers }}</h2>
             </div>
         </div>
     </div>
+
+    <!-- Carte existante : Nombre Total de Bons -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-file-alt"></i> Nombre Total de Bons</h5>
+                <h2 class="card-text">{{ $totalBons }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carte existante : Montant Total des Bons -->
+    <div class="col-md-4 col-sm-12 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-coins"></i> Montant Total des Bons</h5>
+                <h2 class="card-text">{{ number_format($montantTotal, 0, ',', ' ') }} FCFA</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nouvelle carte : Nombre de Bons Validés -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-check-circle"></i> Bons Validés</h5>
+                <h2 class="card-text">{{ $bonsValides }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nouvelle carte : Montant des Bons Validés -->
+    <div class="col-md-4 col-sm-6 mb-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body text-center">
+                <h5 class="card-title"><i class="fas fa-check-circle"></i> Montant Validé</h5>
+                <h2 class="card-text">{{ number_format($montantValide, 0, ',', ' ') }} FCFA</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Tableau des bons par utilisateur -->
     <div class="card mb-4">
@@ -87,9 +110,14 @@
             </form>
         </div>
     </div>
+    @if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+    @endif
 
     <!-- Tableau des bons tirés -->
-    <div class="card">
+    <div class="card" id="tableau-resultats">
         <div class="card-header">
             <h5 class="card-title"><i class="fas fa-list"></i> Liste des Bons Tirés</h5>
             <p class="text-muted">Nombre total : <strong>{{ $nombreBons }}</strong></p>
@@ -106,12 +134,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if(session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-
                         @if($bons->isEmpty())
                             <tr>
                                 <td colspan="4" class="text-center text-muted">Aucun bon trouvé pour cette période.</td>
@@ -133,7 +155,6 @@
                             @endforeach
                         @endif
                     </tbody>
-
                 </table>
             </div>
         </div>
@@ -141,5 +162,17 @@
 
 </div>
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Vérifie si le formulaire a été soumis (filtrage appliqué)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('date_debut') || urlParams.has('date_fin')) {
+            // Fait défiler la page vers le tableau des résultats
+            const tableauResultats = document.getElementById('tableau-resultats');
+            if (tableauResultats) {
+                tableauResultats.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+</script>
 @endsection
