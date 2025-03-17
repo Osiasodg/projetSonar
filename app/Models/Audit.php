@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Audit;
 
 class Audit extends Model
 {
@@ -20,4 +21,7 @@ class Audit extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+
+
 }

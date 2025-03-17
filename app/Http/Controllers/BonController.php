@@ -22,7 +22,7 @@ class BonController extends Controller
             return back()->with('error', 'Bon invalide'); //numéro introuvable
         }
 
-        if (Carbon::parse($bon->date_validite)->isPast()) {
+        if (Carbon::parse($bon->date_validite)->endOfDay()->isPast()) {
             return back()->with('error', 'Bon invalide (date expirée)'); //date expirée
         }
 
@@ -48,9 +48,10 @@ class BonController extends Controller
             return back()->with('error', 'Bon invalide (numéro introuvable)');
         }
 
-        if (Carbon::parse($bon->date_validite)->isPast()) {
+        if (Carbon::parse($bon->date_validite)->endOfDay()->isPast()) {
             return back()->with('error', 'Bon invalide (date expirée)');
         }
+        
 
         if ($bon->utilise) {
             return back()->with('error', 'Bon déjà utilisé');

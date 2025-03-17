@@ -244,8 +244,35 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        return view('admin.dashboard');
+        // Nombre d'utilisateurs connectés (activité récente)
+    $utilisateursConnectes = User::where('last_activity', '>=', now()->subMinutes(5))->count();
+
+    // Nombre total de sociétés
+    $totalSocietes = Societe::count();
+
+    // Nombre total de bons cadeaux
+    $totalBons = Bon::count();
+
+    // Récupérer les 10 dernières activités des gestionnaires
+    $activites = Audit::whereHas('user', function ($query) {
+        $query->where('role', 'gestionnaire');
+    })
+    ->with('user')
+    ->latest()
+    ->take(10)
+    ->get();
+
+        // Passer les données à la vue
+        return view('admin.dashboard', compact(
+            'utilisateursConnectes',
+            'totalSocietes',
+            'totalBons',
+            'activites'
+        ));
+        //return view('admin.dashboard');
     }
+
+    
 
 
     // public function dashboard() {

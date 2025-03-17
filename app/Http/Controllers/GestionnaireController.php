@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Societe;
 use App\Models\Signataire; 
+use App\Models\Audit;
 
 
 class GestionnaireController extends Controller
@@ -98,6 +99,15 @@ class GestionnaireController extends Controller
             // Ajouter le bon importé au tableau
             $importedBons[] = $bon;
         }
+
+
+        // Enregistrer l'action dans la table audits
+        Audit::create([
+            'user_id' => auth()->id(), // ID de l'utilisateur connecté (gestionnaire)
+            'action' => 'Importation de bons', // Description de l'action
+            'details' => 'Importation de ' . count($importedBons) . ' bons', // Détails supplémentaires
+        ]);
+
 
         // Stocker les bons importés dans la session
         session(['importedBons' => $importedBons]);

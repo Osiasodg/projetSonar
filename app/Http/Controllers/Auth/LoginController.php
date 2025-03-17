@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\Models\User;
+use App\Models\Audit;
+
 
 class LoginController extends Controller
 {
@@ -69,6 +71,17 @@ class LoginController extends Controller
 
     protected function authenticated(Request $request)
     {
+
+        $user = Auth::user();
+
+        // Enregistrer l'activité dans les audits
+        Audit::create([
+            'user_id' => $user->id,
+            'action' => 'Connexion',
+            'details' => "Le gestionnaire {$user->name} s'est connecté.",
+        ]);
+
+
         $user = Auth::user();
        // dd($user->role);
         // Si l'utilisateur est un gestionnaire et doit changer son mot de passe

@@ -6,44 +6,41 @@
 
     <!-- Cartes d'informations -->
     <div class="row mb-4">
-        <!-- Carte 1 : Utilisateurs -->
-        <div class="col-md-4">
+        <!-- Carte 1 : Utilisateurs connectés -->
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-users"></i> Utilisateurs</h5>
-                    <p class="card-text">Nombre total d'utilisateurs : 120</p>
-                    <a href="#" class="text-white">Voir plus <i class="fas fa-arrow-right"></i></a>
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-users"></i> Utilisateurs connectés</h5>
+                    <h2 class="card-text">{{ $utilisateursConnectes }}</h2>
                 </div>
             </div>
         </div>
 
         <!-- Carte 2 : Sociétés -->
-        <div class="col-md-4">
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-success text-white">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <h5 class="card-title"><i class="fas fa-building"></i> Sociétés</h5>
-                    <p class="card-text">Nombre total de sociétés : 45</p>
-                    <a href="#" class="text-white">Voir plus <i class="fas fa-arrow-right"></i></a>
+                    <h2 class="card-text">{{ $totalSocietes }}</h2>
                 </div>
             </div>
         </div>
 
-        <!-- Carte 3 : Tickets -->
-        <div class="col-md-4">
+        <!-- Carte 3 : Bons Cadeaux -->
+        <div class="col-md-4 col-sm-6 mb-3">
             <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-ticket-alt"></i> Tickets</h5>
-                    <p class="card-text">Tickets ouverts : 15</p>
-                    <a href="#" class="text-dark">Voir plus <i class="fas fa-arrow-right"></i></a>
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-gift"></i> Bons Cadeaux</h5>
+                    <h2 class="card-text">{{ $totalBons }}</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tableau des dernières activités -->
-    <div class="card">
+    <!-- Tableau des dernières activités des gestionnaires -->
+    <div class="card mt-4">
         <div class="card-header">
-            <h5 class="card-title"><i class="fas fa-history"></i> Dernières Activités</h5>
+            <h5 class="card-title"><i class="fas fa-history"></i> Dernières Activités des Gestionnaires</h5>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -51,40 +48,31 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Utilisateur</th>
+                            <th>Gestionnaire</th>
                             <th>Action</th>
+                            <th>Détails</th>
                             <th>Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>John Doe</td>
-                            <td>Connexion</td>
-                            <td>2023-10-01 14:30</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Jane Smith</td>
-                            <td>Création d'une société</td>
-                            <td>2023-10-01 15:00</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Alice Johnson</td>
-                            <td>Modification de profil</td>
-                            <td>2023-10-01 16:15</td>
-                        </tr>
-                    </tbody>
+    @forelse($activites as $activite)
+        <tr>
+            <td>{{ $activite->id }}</td>
+            <td>{{ $activite->user->name ?? 'Utilisateur inconnu' }}</td> 
+            <td>{{ $activite->action }}</td>
+            <td>{{ $activite->details }}</td>
+            <td>{{ $activite->created_at->format('d/m/Y H:i') }}</td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="5" class="text-center">Aucune activité récente.</td>
+        </tr>
+    @endforelse
+</tbody>
+
                 </table>
             </div>
         </div>
     </div>
 </div>
 @endsection
-
-<!-- <div class="container-fluid" style="margin-left: 250px;">
-    <h2 class="text-center">Tableau de Bord - Administrateur</h2>
-
-    <p>Bienvenue sur le tableau de bord administrateur.</p>
-</div> -->
