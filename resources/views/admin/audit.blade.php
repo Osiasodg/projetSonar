@@ -119,8 +119,8 @@
     <!-- Tableau des bons tirés -->
     <div class="card" id="tableau-resultats">
         <div class="card-header">
-            <h5 class="card-title"><i class="fas fa-list"></i> Liste des Bons Tirés</h5>
-            <p class="text-muted">Nombre total : <strong>{{ $nombreBons }}</strong></p>
+            <h5 class="card-title"><i class="fas fa-list"></i> Liste des Bons</h5>
+            <p class="text-muted">Nombre total bons affichés : <strong>{{ $nombreBons }}</strong></p>
         </div>
         <div class="card-body">
             <div class="table-responsive">

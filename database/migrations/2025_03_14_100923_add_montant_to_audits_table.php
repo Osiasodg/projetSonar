@@ -24,5 +24,6 @@ return new class extends Migration
         Schema::table('audits', function (Blueprint $table) {
             $table->dropColumn('montant');
         });
+        
     }
 };

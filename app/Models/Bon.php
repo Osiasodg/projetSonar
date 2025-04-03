@@ -26,16 +26,24 @@ class Bon extends Model
         'entite',     
         'logo_path', 
         'user_id' ,
-        'signataire_id'
+        'signataire_id',
+        'modele_id',
     ];
+
     public function signataire()
     {
         return $this->belongsTo(Signataire::class, 'signataire_id');
+    }
+
+    public function modele()
+    {
+        return $this->belongsTo(\App\Models\Modele::class, 'modele_id');
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
 
 }

@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- resources/views/admin/modeles.blade.php -->
 <div class="card shadow mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header">
         <h5>Gestion des modèles</h5>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModeleModal">
-            <i class="fas fa-plus"></i> Ajouter
-        </button>
     </div>
     <div class="card-body">
+        @if(session('message'))
+            <div class="alert alert-success">{{ session('message') }}</div>
+        @endif
+
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead>
@@ -20,53 +20,75 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($modeles as $modele)
+                @foreach($modeles as $modele)
                     <tr>
                         <td>{{ $modele->nom }}</td>
-                        <td>{{ $modele->description }}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModeleModal{{ $modele->id }}">
-                                <i class="fas fa-edit"></i>
+                            <span class="desc-text" id="desc-text-{{ $loop->index }}">{{ $modele->description }}</span>
+                            <input type="text" class="form-control desc-input d-none" 
+                                   id="desc-input-{{ $loop->index }}" 
+                                   value="{{ $modele->description }}" 
+                                   data-id="{{ $modele->id }}">
+                        </td>
+                        <td>
+                            <a href="{{ route('admin.modeles.preview', ['modele' => $modele->nom . '.blade.php']) }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i> Voir
+                            </a>
+
+                            <button class="btn btn-sm btn-warning edit-btn" data-index="{{ $loop->index }}">
+                                <i class="fas fa-edit"></i> Modifier
                             </button>
-                            <form action="{{ route('admin.modeles.delete', $modele->id) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            <button class="btn btn-sm btn-success save-btn d-none" data-index="{{ $loop->index }}">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
                         </td>
                     </tr>
-                    @endforeach
+                @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Modal Ajout Modèle -->
-<div class="modal fade" id="addModeleModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ajouter un Modèle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.modeles.create') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <input type="text" name="nom" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Ajouter</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<script>
+document.querySelectorAll('.edit-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        let index = this.getAttribute('data-index');
+        document.getElementById('desc-text-' + index).classList.add('d-none');
+        document.getElementById('desc-input-' + index).classList.remove('d-none');
+        document.querySelector('.save-btn[data-index="' + index + '"]').classList.remove('d-none');
+        this.classList.add('d-none');
+    });
+});
+
+document.querySelectorAll('.save-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        let index = this.getAttribute('data-index');
+        let input = document.getElementById('desc-input-' + index);
+        let description = input.value;
+        let id = input.getAttribute('data-id');
+
+        fetch(`/admin/modeles/update/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ description: description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('desc-text-' + index).textContent = description;
+                document.getElementById('desc-text-' + index).classList.remove('d-none');
+                input.classList.add('d-none');
+                button.classList.add('d-none');
+                document.querySelector('.edit-btn[data-index="' + index + '"]').classList.remove('d-none');
+            } else {
+                alert("Erreur : " + data.error);
+            }
+        });
+    });
+});
+</script>
 @endsection

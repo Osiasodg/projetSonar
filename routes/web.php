@@ -100,7 +100,11 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
 
 
     // Importation de fichiers Excel
-    Route::post('/import', [GestionnaireController::class, 'import'])->name('gestionnaire.import');
+    //Route::post('/import', [GestionnaireController::class, 'import'])->name('gestionnaire.import');
+    Route::middleware(['auth'])->prefix('gestionnaire')->group(function () {
+        Route::post('/import', [GestionnaireController::class, 'import'])->name('gestionnaire.import');
+    });
+    
     // affichage des bons
     Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])->name('gestionnaire.dashboard');
 
@@ -146,10 +150,20 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
     Route::get('/modeles', [AdminController::class, 'modeles'])->name('admin.modeles');
     Route::post('/modeles/create', [AdminController::class, 'createModele'])->name('admin.modeles.create');
     Route::post('/modeles/update/{id}', [AdminController::class, 'updateModele'])->name('admin.modeles.update');
-    Route::post('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
+    Route::delete('/modeles/delete/{id}', [AdminController::class, 'deleteModele'])->name('admin.modeles.delete');
+    Route::get('/modeles/edit/{id}', [AdminController::class, 'editModele'])->name('admin.modeles.edit');
+   // Route::get('/admin/modeles/create', [AdminController::class, 'createModele'])->name('admin.modeles.create');
+    Route::get('/modeles/create', [AdminController::class, 'showCreateModele'])->name('admin.modeles.create');
+    Route::get('/admin/modeles/preview/{modele}', [AdminController::class, 'previewModele'])->name('admin.modeles.preview');
+    Route::post('/modeles/update', [GestionnaireController::class, 'updateModele'])->name('admin.modeles.update');
+    Route::put('/modeles/update/{id}', [ModeleController::class, 'update']);
+    Route::put('/admin/modeles/update/{id}', [AdminController::class, 'updateDescription'])->name('admin.modeles.update');
+    
 
     // Journal d'audit
     Route::get('/audit', [AdminController::class, 'audit'])->name('admin.audit');
     // Route pour vider la session dans gestionnaire/dashboard
     Route::post('/clear-session', [GestionnaireController::class, 'clearSession'])->name('clear.session');
+
+    
 //});

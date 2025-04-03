@@ -11,17 +11,17 @@
             <form action="{{ route('gestionnaire.import') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Fichier Excel (.xlsx, .xls)</label>
+                    <label class="form-label fw-bold text-primary">Fichier Excel (.xlsx, .xls)</label>
                     <input type="file" id="fileInput" name="file" class="form-control" accept=".xlsx,.xls" required>
                     <p id="fileError" class="text-danger mt-2" style="display: none;">Veuillez sélectionner un fichier Excel (.xls ou .xlsx).</p>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Logo de l'entreprise</label>
+                    <label class="form-label fw-bold text-primary">Logo de l'entreprise</label>
                     <input type="file" name="logo" class="form-control" accept="image/*" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Societé</label>
+                    <label class="form-label fw-bold text-primary">Societé</label>
                     <select name="entite" class="form-select" required>
                         @foreach($societes as $societe)
                             <option value="{{ $societe->nom }}">{{ $societe->nom }}</option>
@@ -30,19 +30,30 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Date de validité</label>
+                    <label class="form-label fw-bold text-primary">Date de validité</label>
                     <input type="date" name="date_validite" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Récepteur du bon</label>
+                    <label class="form-label fw-bold text-primary">Récepteur du bon</label>
                     <input type="text" name="recepteur" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Téléphone du récepteur</label>
+                   <label class="form-label fw-bold text-primary">Téléphone du récepteur</label>
                     <input type="text" name="telephone" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Signataire</label>
+                    <label class="form-label fw-bold text-primary">Modèle</label>
+                    <select name="modele_nom" class="form-select" required>
+                        <option value="">Sélectionnez un modèle</option>
+                        @foreach($fichiersModeles as $modele)
+                            <option value="{{ $modele->nom }}">{{ $modele->description }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-primary">Signataire</label>
                     <select name="signataire_id" class="form-select" required>
                         @foreach($signataires as $signataire)
                             <option value="{{ $signataire->id }}">{{ $signataire->nom }} {{ $signataire->prenom }}</option>

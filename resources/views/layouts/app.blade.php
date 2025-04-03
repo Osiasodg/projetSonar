@@ -9,6 +9,9 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <!-- Livewire Styles -->
+    @livewireStyles 
     <style>
         /* Mode sombre */
         .dark-mode {
@@ -112,6 +115,9 @@
             </main>
         </div>
     </div>
+
+     <!-- Livewire Scripts -->
+     @livewireScripts 
     <script>
         // Fonction pour basculer entre les modes clair et sombre
         function toggleTheme() {

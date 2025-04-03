@@ -12,5 +12,24 @@ class Modele extends Model
     protected $fillable = [
         'nom',
         'description',
+        'elements'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($modele) {
+            if (empty($modele->nom) && !empty($modele->fichier)) {
+                $modele->nom = pathinfo($modele->fichier, PATHINFO_FILENAME);
+            }
+        });
+
+        static::creating(function ($modele) {
+            if (empty($modele->description)) {
+                $modele->description = $modele->nom;
+            }
+        });
+    }
+
 }

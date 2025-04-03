@@ -11,6 +11,11 @@ use App\Models\Audit;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\Bon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\File;
+
 
 
 
@@ -156,23 +161,101 @@ class AdminController extends Controller
 
     // Gestion des modèles
     public function modeles() {
+        // Chemin du dossier des modèles
+        $chemin = resource_path('views/bons/bonModeles');
+    
+        // Récupérer les fichiers .blade.php et extraire leur nom sans extension
+        $fichiers = collect(File::files($chemin))
+            ->map(function ($file) {
+                $nomComplet = $file->getFilename(); // Ex: "bon-pdf.blade.php"
+                return Str::before($nomComplet, '.blade.php'); // Extrait "bon-pdf"
+            });
+    
+        // Vérifier si les fichiers existent en base et les ajouter si besoin
+        foreach ($fichiers as $nomFichier) {
+            Modele::updateOrInsert(
+                ['nom' => $nomFichier], // Condition : Si "nom" existe, mettre à jour
+                ['description' => DB::raw("IF(description IS NULL OR description = 'Aucune description', '$nomFichier', description)"), 'elements' => json_encode([])]
+            );
+            
+            
+            
+        }
+    
+        // Récupérer les modèles en base
         $modeles = Modele::all();
+    
         return view('admin.modeles', compact('modeles'));
     }
 
+    //previsualisation du modele
+    public function previewModele($modele) {
+        $modelePath = "bons.$modele";
+    
+        if (!view()->exists($modelePath)) {
+            return back()->with('error', 'Modèle introuvable.');
+        }
+    
+        return view($modelePath, [
+            'montant' => '10 000',
+            'beneficiaire' => 'John Doe',
+            'date' => now()->format('d/m/Y')
+        ]);
+    }
+
+
+    public function updateDescription(Request $request, $id)
+{
+    $request->validate([
+        'description' => 'required|string|max:255',
+    ]);
+
+    $modele = Modele::findOrFail($id);
+    $modele->update(['description' => $request->description]);
+
+    return response()->json(['success' => true, 'message' => 'Description mise à jour']);
+}
+
+    
+    
+    
     public function createModele(Request $request) {
-        Modele::create($request->all());
-        return back()->with('success', 'Modèle ajouté');
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'elements' => 'required', // On attend ici la structure JSON
+        ]);
+    
+        Modele::create([
+            'nom' => $validated['nom'],
+            'description' => $validated['description'] ?? null, // Stocker la description
+            'elements' => $validated['elements'],
+        ]);
+    
+        return back()->with('success', 'Modèle ajouté avec succès.');
     }
-
+    
+    
+    // Mettre à jour uniquement la description du modèle
     public function updateModele(Request $request, $id) {
-        Modele::findOrFail($id)->update($request->all());
-        return back()->with('success', 'Modèle mis à jour');
-    }
+        $modele = Modele::findOrFail($id);
 
+        $request->validate([
+            'description' => 'nullable|string',
+        ]);
+
+        $modele->update(['description' => $request->description]);
+
+        return response()->json(['success' => true, 'message' => 'Description mise à jour avec succès.']);
+    }
+    
+
+
+
+    
     public function deleteModele($id) {
         Modele::findOrFail($id)->delete();
-        return back()->with('success', 'Modèle supprimé');
+        return back()->with('success', 'Modèle supprimé.');
     }
 
     // Journal d'audit

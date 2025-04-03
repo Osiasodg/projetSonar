@@ -11,6 +11,8 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\Societe;
 use App\Models\Signataire; 
 use App\Models\Audit;
+use App\Models\Modele;
+use Illuminate\Support\Facades\File;
 
 
 class GestionnaireController extends Controller
@@ -25,11 +27,20 @@ class GestionnaireController extends Controller
         // Récupérer tous les signataires depuis la base de données
         $signataires = Signataire::all();
 
+       // $modeles = \App\Models\Modele::all(); // Récupération de tous les modèles
+
+         // Récupérer tous les modèles depuis la base de données
+        $fichiersModeles = Modele::all(); 
+
+
+        
+
         // Passer les données à la vue
         return view('gestionnaire.dashboard', [
             'showNavbar' => true,
             'societes' => $societes,
-            'signataires' => $signataires 
+            'signataires' => $signataires,
+            'fichiersModeles' => $fichiersModeles, // Ajout des modèles
         ]);
     }
 
@@ -54,6 +65,7 @@ class GestionnaireController extends Controller
     // Importe un fichier Excel
     public function import(Request $request)
     {
+        //dd($request->all());
         // Validation des données reçues
         $validated = $request->validate([
             'file' => 'required|mimes:xlsx,xls|max:2048',
@@ -62,8 +74,12 @@ class GestionnaireController extends Controller
             'date_validite' => 'required|date',
             'recepteur' => 'required|string',
             'telephone' => 'required|string',
-            'signataire_id' => 'required|exists:signataires,id'
+            'signataire_id' => 'required|exists:signataires,id',
+            'modele_nom' => 'required|string|exists:modeles,nom',   
         ]);
+
+         // Récupérer l'ID du modèle sélectionné
+        $modele = Modele::where('nom', $validated['modele_nom'])->firstOrFail();
 
         // Enregistrer le logo et récupérer son chemin
         $logoPath = $request->file('logo')->store('logos', 'public');
@@ -93,7 +109,10 @@ class GestionnaireController extends Controller
                 'entite' => $validated['entite'],
                 'logo_path' => $logoPath,
                 'user_id' => auth()->id() ?? 1, // Ajoute l'ID de l'utilisateur connecté, ou une valeur par défaut
-                'signataire_id' => $validated['signataire_id'] // Enregistre l'ID du signataire
+                'signataire_id' => $validated['signataire_id'] ,// Enregistre l'ID du signataire
+                'modele_id' => $modele->id,
+
+                
             ]);
 
             // Ajouter le bon importé au tableau
@@ -102,6 +121,8 @@ class GestionnaireController extends Controller
 
 
         // Enregistrer l'action dans la table audits
+        //dd(auth()->id());
+       
         Audit::create([
             'user_id' => auth()->id(), // ID de l'utilisateur connecté (gestionnaire)
             'action' => 'Importation de bons', // Description de l'action
@@ -125,11 +146,33 @@ class GestionnaireController extends Controller
     //methode pour generer les fichier pdf
     public function generatePDFs(Request $request)
     {
+        // Récupérer l'ID du modèle choisi
+        //$modeleId = $request->input('modele_id');
+        // Récupérer le modèle si sélectionné
+        // $modele = null;
+        // if ($modeleId) {
+        //     $modele->elements = json_decode($modele->elements, true);
+        // }
+
+
+
         // Récupérer les IDs des bons envoyés via le formulaire
         $bonIds = $request->input('bon_ids', []);
 
         // Récupérer les bons correspondants depuis la base de données
-        $bons = Bon::whereIn('id', $bonIds)->get();
+       // $bons = Bon::whereIn('id', $bonIds)->get();
+
+        // Récupérer les bons avec leur modèle associé
+         $bons = Bon::with('modele')->whereIn('id', $bonIds)->get();
+
+        // Vérifier que tous les bons ont un modèle
+        foreach ($bons as $bon) {
+            if (!$bon->modele) {
+                return back()->with('error', 'Un ou plusieurs bons n’ont pas de modèle associé.');
+            }
+        }
+
+        $viewPath = "bons.bonModeles." . $bons->first()->modele->nom;
 
         // Créer un tableau pour stocker les chemins des QR Codes
         $qrCodes = [];
@@ -161,17 +204,18 @@ class GestionnaireController extends Controller
         $logoPath = storage_path('app/public/' . $bon->logo_path); // Assurez-vous que le fichier existe
 
         // Passer les données à la vue et générer le PDF
-        $pdf = PDF::loadView('bons.bon-pdf', [
+        $pdf = PDF::loadView($viewPath, [
             'bons' => $bons,
             'qrCodes' => $qrCodes, // On passe maintenant un tableau de QR Codes
             'logoPath' => $logoPath,
             'entite' => $bons->first()->entite ?? 'Entité Inconnue', // Remplace par la bonne valeur
             'directeur' => 'Thomas ZONGO', // Remplace par une valeur dynamique si nécessaire
-            'signataires' => $signataires // Passer les informations des signataires
+            'signataires' => $signataires ,// Passer les informations des signataires
+            'modele' => $bons->first()->modele, // Passage du modèle sélectionné
         ]);
 
         // Télécharger le PDF unique contenant tous les bons
-        return $pdf->download('bons-pdf.pdf');
+        return $pdf->download("bons-{$bons->first()->modele->nom}.pdf");
     }
 
     public function signataire()
@@ -184,7 +228,8 @@ class GestionnaireController extends Controller
     {
         // Vider les données de session
         $request->session()->forget(['importedBons', 'bons']);
-        
+       // dd($modeles);
+
         // Rediriger vers le tableau de bord
         return redirect()->route('gestionnaire.dashboard');
     }
