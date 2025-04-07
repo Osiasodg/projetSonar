@@ -111,6 +111,7 @@ class GestionnaireController extends Controller
                 'user_id' => auth()->id() ?? 1, // Ajoute l'ID de l'utilisateur connecté, ou une valeur par défaut
                 'signataire_id' => $validated['signataire_id'] ,// Enregistre l'ID du signataire
                 'modele_id' => $modele->id,
+                'is_generated' => false,
 
                 
             ]);
@@ -196,6 +197,13 @@ class GestionnaireController extends Controller
 
             // Récupérer les informations du signataire
              $signataires[$bon->id] = $bon->signataire; // Utilise la relation définie dans le modèle Bon
+        }
+
+
+        // ✅ Marquer les bons comme générés
+        foreach ($bons as $bon) {
+            $bon->is_generated = true;
+            $bon->save();
         }
 
         // Récupérer le chemin du logo

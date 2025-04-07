@@ -205,16 +205,16 @@ class AdminController extends Controller
 
 
     public function updateDescription(Request $request, $id)
-{
-    $request->validate([
-        'description' => 'required|string|max:255',
-    ]);
+    {
+        $request->validate([
+            'description' => 'required|string|max:255',
+        ]);
 
-    $modele = Modele::findOrFail($id);
-    $modele->update(['description' => $request->description]);
+        $modele = Modele::findOrFail($id);
+        $modele->update(['description' => $request->description]);
 
-    return response()->json(['success' => true, 'message' => 'Description mise à jour']);
-}
+        return response()->json(['success' => true, 'message' => 'Description mise à jour']);
+    }
 
     
     
@@ -265,12 +265,12 @@ class AdminController extends Controller
     
         // Statistiques de base
         $totalUsers = User::where('role', 'gestionnaire')->count();
-        $totalBons = Bon::count();
-        $montantTotal = Bon::sum('montant');
+        $totalBons = Bon::where('is_generated', true)->count();
+        $montantTotal = Bon::where('is_generated', true)->sum('montant');
     
         // Statistiques sur les bons validés
-        $bonsValides = Bon::where('utilise', true)->count();
-        $montantValide = Bon::where('utilise', true)->sum('montant');
+        $bonsValides = Bon::where('is_generated', true)->where('utilise', true)->count();
+        $montantValide = Bon::where('is_generated', true)->where('utilise', true)->sum('montant');
     
         // Récupération des dates du formulaire
         $dateDebut = $request->input('date_debut');
@@ -287,7 +287,8 @@ class AdminController extends Controller
         }
     
         // Construction de la requête pour les bons
-        $query = Bon::orderBy('created_at', 'desc');
+        $query = Bon::where('is_generated', true)->orderBy('created_at', 'desc');
+
     
         // Filtrage par dates si les dates sont fournies
         if ($dateDebut && $dateFin) {
@@ -305,10 +306,12 @@ class AdminController extends Controller
         $nombreBons = $bons->count();
     
         // Statistiques par utilisateur
-        $bonsParUtilisateur = Bon::selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
+        $bonsParUtilisateur = Bon::where('is_generated', true)
+            ->selectRaw('user_id, COUNT(*) as total_bons, SUM(montant) as total_montant')
             ->groupBy('user_id')
             ->with('user')
             ->get();
+
     
         return view('admin.audit', compact(
             'audits', 
@@ -328,13 +331,17 @@ class AdminController extends Controller
     public function dashboard()
     {
         // Nombre d'utilisateurs connectés (activité récente)
-    $utilisateursConnectes = User::where('last_activity', '>=', now()->subMinutes(5))->count();
+        User::where('last_activity', '>=', now()->subMinutes(5))->get(['name', 'prenom']);
 
+
+
+        $utilisateursConnectes = [];
+        
     // Nombre total de sociétés
     $totalSocietes = Societe::count();
 
     // Nombre total de bons cadeaux
-    $totalBons = Bon::count();
+    $totalBons = Bon::where('is_generated', true)->count();
 
     // Récupérer les 10 dernières activités des gestionnaires
     $activites = Audit::whereHas('user', function ($query) {

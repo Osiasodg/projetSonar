@@ -28,6 +28,7 @@ class Bon extends Model
         'user_id' ,
         'signataire_id',
         'modele_id',
+        'is_generated',
     ];
 
     public function signataire()

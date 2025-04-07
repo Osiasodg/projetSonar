@@ -11,7 +11,7 @@
             <div class="card bg-primary text-white">
                 <div class="card-body text-center">
                     <h5 class="card-title"><i class="fas fa-users"></i> Utilisateurs connectés</h5>
-                    <h2 class="card-text">{{ $utilisateursConnectes }}</h2>
+                    <h2 class="card-text">{{ count($utilisateursConnectes) }}</h2>
                 </div>
             </div>
         </div>
@@ -55,20 +55,21 @@
                         </tr>
                     </thead>
                     <tbody>
-    @forelse($activites as $activite)
-        <tr>
-            <td>{{ $activite->id }}</td>
-            <td>{{ $activite->user->name ?? 'Utilisateur inconnu' }}</td> 
-            <td>{{ $activite->action }}</td>
-            <td>{{ $activite->details }}</td>
-            <td>{{ $activite->created_at->format('d/m/Y H:i') }}</td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="5" class="text-center">Aucune activité récente.</td>
-        </tr>
-    @endforelse
-</tbody>
+                        @forelse($activites as $activite)
+                            <tr>
+                                <td>{{ $activite->id }}</td>
+                                <td>{{ $activite->user->prenom ?? 'Prénom inconnu' }} {{ $activite->user->name ?? 'Nom inconnu' }}</td>
+
+                                <td>{{ $activite->action }}</td>
+                                <td>{{ $activite->details }}</td>
+                                <td>{{ $activite->created_at->format('d/m/Y H:i') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">Aucune activité récente.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
 
                 </table>
             </div>

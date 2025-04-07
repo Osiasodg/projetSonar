@@ -31,9 +31,6 @@
                                    data-id="{{ $modele->id }}">
                         </td>
                         <td>
-                            <a href="{{ route('admin.modeles.preview', ['modele' => $modele->nom . '.blade.php']) }}" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i> Voir
-                            </a>
 
                             <button class="btn btn-sm btn-warning edit-btn" data-index="{{ $loop->index }}">
                                 <i class="fas fa-edit"></i> Modifier
