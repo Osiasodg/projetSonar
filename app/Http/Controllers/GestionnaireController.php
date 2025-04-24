@@ -242,4 +242,60 @@ class GestionnaireController extends Controller
         return redirect()->route('gestionnaire.dashboard');
     }
 
+    public function previewBon(Request $request)
+    {
+        \Log::info('Début previewBon', ['bon_ids' => $request->bon_ids]);
+
+        try {
+            $bonIds = $request->input('bon_ids', []);
+
+            if (empty($bonIds)) {
+                return response('<div class="alert alert-danger">Aucun bon sélectionné</div>', 400);
+            }
+
+            $bons = Bon::with(['modele', 'signataire'])->whereIn('id', $bonIds)->get();
+
+            if ($bons->isEmpty()) {
+                return response('<div class="alert alert-danger">Aucun bon trouvé</div>', 404);
+            }
+
+            $viewPath = "bons.bonModeles." . $bons->first()->modele->nom;
+            if (!view()->exists($viewPath)) {
+                return response('<div class="alert alert-danger">Vue modèle introuvable</div>', 404);
+            }
+
+            // Générer QR code (base64, pas fichiers)
+            $qrCodes = [];
+            foreach ($bons as $bon) {
+                $qrData = "BON D'ACHAT N°: {$bon->numero}\nBénéficiaire: {$bon->beneficiaire}\nMontant: " .
+                    number_format($bon->montant, 0, ',', ' ') . " FCFA\nValidité: " .
+                    date('d/m/Y', strtotime($bon->date_validite)) . "\n";
+
+                $qrCodes[$bon->id] = 'data:image/png;base64,' . base64_encode(
+                    \QrCode::format('png')->size(100)->generate($qrData)
+                );
+            }
+
+            // Logo en URL publique
+            $logoPath = asset("storage/" . $bons->first()->logo_path);
+
+            $html = view($viewPath, [
+                'bons' => collect([$bons->first()]), // Juste 1 bon pour prévisualisation
+                'qrCodes' => $qrCodes,
+                'logoPath' => $logoPath,
+                'entite' => $bons->first()->entite,
+                'signataires' => [$bons->first()->id => $bons->first()->signataire],
+                'modele' => $bons->first()->modele,
+                'isPreview' => true
+            ])->render();
+
+            return response($html); // retour simple HTML
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur previewBon: ' . $e->getMessage());
+            return response('<div class="alert alert-danger">Erreur interne: ' . e($e->getMessage()) . '</div>', 500);
+        }
+    }
+
+
 }

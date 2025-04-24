@@ -154,10 +154,32 @@ class AdminController extends Controller
         return back()->with('success', 'Signataire mis à jour');
     }
 
-    public function deleteSignataire($id) {
-        Signataire::findOrFail($id)->delete();
-        return back()->with('success', 'Signataire supprimé');
+    // public function deleteSignataire($id) {
+    //     Signataire::findOrFail($id)->delete();
+    //     return back()->with('success', 'Signataire supprimé');
+    // }
+
+    public function deleteSignataire($id)
+    {
+        try {
+            $signataire = Signataire::findOrFail($id);
+
+            // Vérifie s'il est lié à des bons
+            if ($signataire->bons()->exists()) {
+                return back()->with('error', 'Impossible de supprimer ce signataire car il est utilisé dans des bons.');
+            }
+
+            $signataire->delete();
+
+            return back()->with('success', 'Signataire supprimé avec succès.');
+            
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la suppression du signataire : ' . $e->getMessage());
+
+            return back()->with('error', 'Une erreur est survenue lors de la suppression du signataire.');
+        }
     }
+
 
     // Gestion des modèles
     public function modeles() {

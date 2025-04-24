@@ -35,6 +35,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+
+            @if(isset($isPreview) && $isPreview)
+                min-height: 400px;
+                height: auto;
+                padding-bottom: 60px;
+            @else
+                height: 48%; /* Deux bons par page */
+            @endif
         }
 
         /* Filigrane */

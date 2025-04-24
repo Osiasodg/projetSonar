@@ -21,16 +21,23 @@
             page-break-after: always;
         }
         .container {
-            width: 96%;
-            height: 48%; /* Deux bons sur une page */
-            margin: 0 auto;
-            padding: 30px;
-            border: 3px solid #333;
-            background: #f9f9f9;
-            position: relative;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+        width: 96%;
+        margin: 0 auto;
+        padding: 30px;
+        border: 3px solid #333;
+        background: #f9f9f9;
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+
+        @if(isset($isPreview) && $isPreview)
+            min-height: 400px;
+            height: auto;
+            padding-bottom: 60px;
+        @else
+            height: 48%; /* Deux bons par page */
+        @endif
         }
         
         /* Positionnement des éléments */

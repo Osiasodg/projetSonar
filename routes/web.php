@@ -165,5 +165,5 @@ Route::get('/gestionnaire/dashboard', [GestionnaireController::class, 'index'])-
     // Route pour vider la session dans gestionnaire/dashboard
     Route::post('/clear-session', [GestionnaireController::class, 'clearSession'])->name('clear.session');
 
-    
+    Route::post('/preview-bon', [GestionnaireController::class, 'previewBon'])->name('preview.bon');
 //});

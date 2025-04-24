@@ -105,6 +105,10 @@
 
                 <!-- Boutons Générer PDF et Actualiser sur la même ligne -->
                 <div class="d-flex gap-3 mt-4">
+                     <!-- Bouton Visualiser -->
+                     <button type="button" class="btn btn-primary btn-lg" id="visualiserBtn" data-bs-toggle="modal" data-bs-target="#previewModal">
+                        👁️ Visualiser
+                    </button>
                     <!-- Bouton Générer PDF -->
                     <form action="{{ route('generate.pdfs') }}" method="POST">
                         @csrf
@@ -128,6 +132,32 @@
 
             </div>
         </div>
+
+ <!-- Modal pour l'aperçu -->
+ <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="previewModalLabel">Aperçu du bon</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="previewContent">
+                            <!-- Le contenu de l'aperçu sera chargé ici via AJAX -->
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     @else
         <div class="alert alert-info mt-4">
             Aucun bon importé pour le moment.
@@ -163,4 +193,107 @@
         }
     });
 </script>
+<!-- <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const visualiserBtn = document.getElementById('visualiserBtn');
+    if (visualiserBtn) {
+        visualiserBtn.addEventListener('click', function() {
+            const content = document.getElementById('previewContent');
+            content.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p>Chargement de l'aperçu...</p>
+                </div>`;
+
+            const bonIds = Array.from(document.querySelectorAll('input[name="bon_ids[]"]'))
+                                .map(input => input.value);
+
+            if (bonIds.length === 0) {
+                content.innerHTML = `<div class="alert alert-danger">Aucun bon sélectionné</div>`;
+                return;
+            }
+
+            fetch("{{ route('preview.bon') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/html',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ bon_ids: bonIds })
+            })
+            .then(response => {
+                if (!response.ok) return response.text().then(t => { throw new Error(t) });
+                return response.text();
+            })
+            .then(html => {
+                content.innerHTML = html;
+                const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+                modal.show();
+            })
+            .catch(error => {
+                content.innerHTML = `<div class="alert alert-danger">Erreur lors du chargement :<br>${error.message}</div>`;
+            });
+        });
+    }
+});
+</script> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const visualiserBtn = document.getElementById('visualiserBtn');
+    const previewModal = document.getElementById('previewModal');
+    const previewContent = document.getElementById('previewContent');
+
+    // Vérification que les éléments existent
+    if (!visualiserBtn || !previewModal || !previewContent) return;
+
+    // Lors du clic sur "Visualiser"
+    visualiserBtn.addEventListener('click', function () {
+        previewContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+                <p>Chargement de l'aperçu...</p>
+            </div>`;
+
+        const bonIds = Array.from(document.querySelectorAll('input[name="bon_ids[]"]'))
+                            .map(input => input.value);
+
+        if (bonIds.length === 0) {
+            previewContent.innerHTML = `<div class="alert alert-danger">Aucun bon sélectionné</div>`;
+            return;
+        }
+
+        fetch("{{ route('preview.bon') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'text/html',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({ bon_ids: bonIds })
+        })
+        .then(response => {
+            if (!response.ok) return response.text().then(t => { throw new Error(t) });
+            return response.text();
+        })
+        .then(html => {
+            previewContent.innerHTML = html;
+        })
+        .catch(error => {
+            previewContent.innerHTML = `<div class="alert alert-danger">Erreur lors du chargement :<br>${error.message}</div>`;
+        });
+    });
+
+    // Réinitialiser le contenu du modal à la fermeture
+    previewModal.addEventListener('hidden.bs.modal', function () {
+        previewContent.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+                <p>Chargement de l'aperçu...</p>
+            </div>`;
+    });
+});
+</script>
+
 @endsection

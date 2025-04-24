@@ -33,6 +33,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            
+            @if(isset($isPreview) && $isPreview)
+                min-height: 400px;
+                height: auto;
+                padding-bottom: 60px;
+            @else
+                height: 48%; /* Deux bons par page */
+            @endif
         }
         
         
@@ -44,12 +52,15 @@
             transform: translate(-50%, -50%) rotate(-30deg);
             font-size: 80px;
             font-weight: bold;
-            color: rgba(0, 64, 128, 0.15); /* Bleu très clair */
             text-transform: uppercase;
             white-space: nowrap;
-            filter: blur(2px);
+            color: #000;
+            opacity: 0.08; /* Meilleure compatibilité que rgba avec transparence */
+            filter: blur(1.5px); /* Légèrement flouté */
+            pointer-events: none; /* Ne capte pas les clics */
             z-index: 0;
         }
+
 
         /* Positionnement des éléments */
         .qrcode {
